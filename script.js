@@ -2,8 +2,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const sections = document.querySelectorAll('.story-section');
     
     const observerOptions = {
-        root: null, // viewport ko observe karega
-        threshold: 0.1, // jab 10% element visible ho
+        root: null, 
+        threshold: 0.1, 
         rootMargin: '0px'
     };
     
