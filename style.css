@@ -1,0 +1,123 @@
+:root {
+    --primary-color: #556270;
+    --secondary-color: #4ECDC4;
+    --text-dark: #333;
+    --text-light: #f4f4f4;
+    --bg-light: #f4f4f4;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    color: var(--text-dark);
+    background-color: var(--bg-light);
+    overflow-x: hidden;
+}
+
+/* --- Hero Section --- */
+.hero-section {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: var(--text-light);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-content h1 {
+    font-size: 4em;
+    font-weight: 700;
+    margin: 0;
+}
+
+.hero-content p {
+    font-size: 1.5em;
+    font-weight: 300;
+}
+
+/* Fade-in Animation */
+.fade-in {
+    opacity: 0;
+    animation: fadeIn 2s forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Story Sections --- */
+.story-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 80px 5%;
+    min-height: 80vh;
+    gap: 50px;
+    opacity: 0;
+    transform: translateY(50px);
+    transition: opacity 1s ease-out, transform 1s ease-out;
+}
+
+.story-section.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.story-section.reverse {
+    flex-direction: row-reverse;
+}
+
+.content-left, .content-right {
+    flex: 1;
+    max-width: 500px;
+}
+
+.story-section h2 {
+    font-size: 2.5em;
+    color: var(--primary-color);
+}
+
+.story-section p {
+    font-size: 1.1em;
+    line-height: 1.8;
+}
+
+.reveal-img {
+    width: 100%;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transform: scale(0.9);
+    transition: transform 1s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+
+.story-section.is-visible .reveal-img {
+    transform: scale(1);
+}
+
+/* --- Footer --- */
+footer {
+    text-align: center;
+    padding: 40px 0;
+    background-color: var(--primary-color);
+    color: var(--text-light);
+}
+
+footer p {
+    margin: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .story-section {
+        flex-direction: column;
+        text-align: center;
+    }
+    .story-section.reverse {
+        flex-direction: column;
+    }
+}
