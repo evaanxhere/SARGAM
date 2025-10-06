@@ -89,6 +89,8 @@ body {
 
 .reveal-img {
     width: 100%;
+    height: auto; /* Photo ki height ko auto rakhega */
+    object-fit: cover; /* Yeh sabse important property hai */
     border-radius: 15px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     transform: scale(0.9);
@@ -98,6 +100,15 @@ body {
 .story-section.is-visible .reveal-img {
     transform: scale(1);
 }
+
+/* Naya code: Photo ko ek specific frame mein daalne ke liye */
+.content-right {
+    flex: 1;
+    max-width: 500px;
+    height: 400px; /* Yeh height tum badal sakte ho */
+    overflow: hidden; /* Photo ko frame ke bahar jane se rokta hai */
+}
+
 
 /* --- Footer --- */
 footer {
