@@ -48,25 +48,72 @@ Jo bola wo waisa mean nahi tha. I still want things to be good between us, baaki
     </main>
 <canvas id="heartCanvas"></canvas>
 <script>
-const c = document.getElementById('heartCanvas');
-const ctx = c.getContext('2d');
-c.width = innerWidth; c.height = innerHeight;
-const hearts = [];
-function Heart(){ this.x=Math.random()*c.width; this.y=c.height+20;
-this.size=Math.random()*8+4; this.speed=Math.random()*1+0.3;
-this.alpha=1; this.color=`rgba(255,120,150,${this.alpha})`;
-this.draw=()=>{ctx.beginPath();ctx.arc(this.x,this.y,this.size,0,Math.PI*2);
-ctx.fillStyle=this.color;ctx.fill()}}
-function animate(){ctx.clearRect(0,0,c.width,c.height);
-hearts.push(new Heart());
-for(let i=0;i<hearts.length;i++){let h=hearts[i];h.y-=h.speed;h.alpha-=0.002;
-h.color=`rgba(255,120,150,${h.alpha})`;h.draw();
-if(h.alpha<=0){hearts.splice(i,1);i--;}}
-requestAnimationFrame(animate);}
+const canvas = document.getElementById("heartCanvas");
+const ctx = canvas.getContext("2d");
+canvas.width = innerWidth;
+canvas.height = innerHeight;
+
+let hearts = [];
+
+function Heart() {
+  this.x = Math.random() * canvas.width;
+  this.y = canvas.height + 20;
+  this.size = Math.random() * 12 + 8;
+  this.speed = Math.random() * 1 + 0.5;
+  this.alpha = 1;
+  this.color = `rgba(255, 120, 150, ${this.alpha})`;
+
+  this.draw = () => {
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    ctx.rotate(Math.PI / 4);
+    ctx.scale(this.size / 10, this.size / 10);
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.bezierCurveTo(0, -3, -5, -3, -5, 0);
+    ctx.bezierCurveTo(-5, 3, 0, 6, 0, 10);
+    ctx.bezierCurveTo(0, 6, 5, 3, 5, 0);
+    ctx.bezierCurveTo(5, -3, 0, -3, 0, 0);
+    ctx.closePath();
+    ctx.fillStyle = this.color;
+    ctx.fill();
+    ctx.restore();
+  };
+
+  this.update = () => {
+    this.y -= this.speed;
+    this.alpha -= 0.002;
+    this.color = `rgba(255, 120, 150, ${this.alpha})`;
+    this.draw();
+  };
+}
+
+function animate() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  if (Math.random() < 0.1) hearts.push(new Heart());
+  for (let i = 0; i < hearts.length; i++) {
+    hearts[i].update();
+    if (hearts[i].alpha <= 0) hearts.splice(i, 1);
+  }
+  requestAnimationFrame(animate);
+}
 animate();
+
+window.addEventListener("resize", () => {
+  canvas.width = innerWidth;
+  canvas.height = innerHeight;
+});
 </script>
+
 <style>
-#heartCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;}
+#heartCanvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
 </style>
    <footer class="fade-in" style="text-align: center; position: absolute; bottom: 0; width: 100%;">
     <p>Tumhara,Evaan</p>
