@@ -1,9 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // IntersectionObserver for revealing sections
     const sections = document.querySelectorAll('.story-section');
     
     const observerOptions = {
-        root: null, 
-        threshold: 0.1, 
+        root: null,
+        threshold: 0.1,
         rootMargin: '0px'
     };
     
@@ -19,23 +20,32 @@ document.addEventListener('DOMContentLoaded', () => {
     sections.forEach(section => {
         observer.observe(section);
     });
-});
 
-document.addEventListener('DOMContentLoaded', () => {
-    const audio = document.getElementById('bgmusic.mp3');
-    audio.play().catch(e => {
-        console.log("Autoplay was prevented. User must interact to play.");
-    });
-});
-const audio = document.getElementById('myAudio');
-const playButton = document.getElementById('playButton');
+    // Audio playback logic
+    const audio = document.getElementById('backgroundMusic');
+    const playButton = document.getElementById('playButton');
 
-playButton.addEventListener('click', () => {
-    if (audio.paused) {
-        audio.play();
-        playButton.textContent = 'Pause Music';
-    } else {
-        audio.pause();
-        playButton.textContent = 'Play Music';
+    if (!audio) {
+        console.error('Audio element with ID "backgroundMusic" not found.');
+        return;
     }
+
+    if (!playButton) {
+        console.error('Play button with ID "playButton" not found.');
+        return;
+    }
+
+    playButton.addEventListener('click', () => {
+        if (audio.paused) {
+            audio.play().then(() => {
+                playButton.textContent = 'Pause Music';
+            }).catch(error => {
+                console.error('Error playing audio:', error);
+                playButton.textContent = 'Play Music';
+            });
+        } else {
+            audio.pause();
+            playButton.textContent = 'Play Music';
+        }
+    });
 });
