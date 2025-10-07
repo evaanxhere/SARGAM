@@ -20,3 +20,17 @@ document.addEventListener('DOMContentLoaded', () => {
         observer.observe(section);
     });
 });
+// Play button ke liye code
+const audio = document.getElementById('myAudio');
+const playButton = document.getElementById('playButton');
+
+playButton.addEventListener('click', () => {
+    if (audio.paused) {
+        audio.play();
+        playButton.textContent = 'Pause Music';
+    } else {
+        audio.pause();
+        playButton.textContent = 'Play Music';
+    }
+});
+
