@@ -8,26 +8,20 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
 </head>
 <body>
-<audio id="bgmusic.mp3" autoplay loop>
-    <source src="bgmusic.mp3." type="audio/mpeg">
-</audio>
-    
-   
-<header class="hero-section">
-    <div class="hero-content">
-        <h1 class="fade-in">Suno,Oreo</h1>
-        <p class="fade-in sub-text">Just a small gesture ❤️.</p>
-        
-        <div class="button-container">
-            <button id="playButton" class="play-button">Play Music</button>
+    <!-- Single audio element with GitHub-hosted MP3 -->
+    <audio id="backgroundMusic" loop>
+        <source src="https://raw.githubusercontent.com/evaanxhere/Message-/refs/heads/main/bgmusic.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
+    <header class="hero-section">
+        <div class="hero-content">
+            <h1 class="fade-in">Suno, Oreo</h1>
+            <p class="fade-in sub-text">Just a small gesture ❤️.</p>
+            <div class="button-container">
+                <button id="playButton" class="play-button">Play Music</button>
+            </div>
         </div>
-    </div>
-</header>
-
-<audio id="bgmusic.mp3" loop>
-    <source src="bgmusic.mp3" type="audio/mpeg">
-</audio>
-
     </header>
 
     <main>
@@ -36,9 +30,8 @@
                 <p class="quote">"Yaar, Tu Hai Toh Sab Kuch Hai"</p>
                 <h2>Jab Sab Shuru Hua</h2>
                 <p>
-    Mujhe yaad hai, wo din jab hum mile the. Itni jaldi hamari dosti itni gehri ho jayegi, socha nahi tha. Tumhare saath waqt bitana, har choti-badi baat share karna, yeh sab zindagi ka sabse khoobsurat hissa ban gaya hai.Kab SC se IG fir IG se Calls par aye ek call Person na hoke bhi call person bna dia tumne i just enjoy it whatever you say on calls i love your voice too your every mood swings han irritate bhi hota hu but still i love it idk kaise
-</p>
-
+                    Mujhe yaad hai, wo din jab hum mile the. Itni jaldi hamari dosti itni gehri ho jayegi, socha nahi tha. Tumhare saath waqt bitana, har choti-badi baat share karna, yeh sab zindagi ka sabse khoobsurat hissa ban gaya hai. Kab SC se IG fir IG se Calls par aye ek call Person na hoke bhi call person bna dia tumne i just enjoy it whatever you say on calls i love your voice too your every mood swings han irritate bhi hota hu but still i love it idk kaise
+                </p>
             </div>
         </section>
 
@@ -46,7 +39,7 @@
             <div class="content-box">
                 <p class="quote">"You made a special place in my heart ."</p>
                 <h2>Oreo I LOVE YOU</h2>
-                <p>Humne ek saath hasi, gusse, aur narazgi ko bhi dekha hai. Har mushkil ne humare Bond ko aur mazboot kiya. Tumne mujhe itna pyaar diya hai ki main usko words m nahi likh skta.i love spending time with you wo nahi hota to missing feel hota h han ldai hoti h bohot hoti h but fikkr firbhi hmesha rehti h .</p>
+                <p>Humne ek saath hasi, gusse, aur narazgi ko bhi dekha hai. Har mushkil ne humare Bond ko aur mazboot kiya. Tumne mujhe itna pyaar diya hai ki main usko words m nahi likh skta. i love spending time with you wo nahi hota to missing feel hota h han ldai hoti h bohot hoti h but fikkr firbhi hmesha rehti h .</p>
             </div>
         </section>
 
@@ -54,85 +47,87 @@
             <div class="content-box">
                 <p class="quote">"Main janta hoon ki main galat tha, aur is baat ka behad afsos hai."</p>
                 <h2>Ek Chhota Sa "Sorry"</h2>
-                <p>Main janta hoon ki meri baaton se tumhein takleef hui.Kal ka scene unnecessary bigad gaya. Tu genuinely excited thi, aur mai apne hi stress me overthink kar gaya.
-Jo bola wo waisa mean nahi tha. I still want things to be good between us, baaki decide tu kar — no pressure.</p>
+                <p>Main janta hoon ki meri baaton se tumhein takleef hui. Kal ka scene unnecessary bigad gaya. Tu genuinely excited thi, aur mai apne hi stress me overthink kar gaya.
+                Jo bola wo waisa mean nahi tha. I still want things to be good between us, baaki decide tu kar — no pressure.</p>
                 <p class="call-to-action">Call me, please. I am waiting for your call.</p>
             </div>
         </section>
     </main>
-<canvas id="heartCanvas"></canvas>
-<script>
-const canvas = document.getElementById("heartCanvas");
-const ctx = canvas.getContext("2d");
-canvas.width = innerWidth;
-canvas.height = innerHeight;
 
-let hearts = [];
+    <canvas id="heartCanvas"></canvas>
+    <script>
+        const canvas = document.getElementById("heartCanvas");
+        const ctx = canvas.getContext("2d");
+        canvas.width = innerWidth;
+        canvas.height = innerHeight;
 
-function Heart() {
-  this.x = Math.random() * canvas.width;
-  this.y = canvas.height + 20;
-  this.size = Math.random() * 12 + 8;
-  this.speed = Math.random() * 1 + 0.5;
-  this.alpha = 1;
-  this.color = `rgba(255, 120, 150, ${this.alpha})`;
+        let hearts = [];
 
-  this.draw = () => {
-    ctx.save();
-    ctx.translate(this.x, this.y);
-    ctx.rotate(Math.PI / 4);
-    ctx.scale(this.size / 10, this.size / 10);
-    ctx.beginPath();
-    ctx.moveTo(0, 0);
-    ctx.bezierCurveTo(0, -3, -5, -3, -5, 0);
-    ctx.bezierCurveTo(-5, 3, 0, 6, 0, 10);
-    ctx.bezierCurveTo(0, 6, 5, 3, 5, 0);
-    ctx.bezierCurveTo(5, -3, 0, -3, 0, 0);
-    ctx.closePath();
-    ctx.fillStyle = this.color;
-    ctx.fill();
-    ctx.restore();
-  };
+        function Heart() {
+            this.x = Math.random() * canvas.width;
+            this.y = canvas.height + 20;
+            this.size = Math.random() * 12 + 8;
+            this.speed = Math.random() * 1 + 0.5;
+            this.alpha = 1;
+            this.color = `rgba(255, 120, 150, ${this.alpha})`;
 
-  this.update = () => {
-    this.y -= this.speed;
-    this.alpha -= 0.002;
-    this.color = `rgba(255, 120, 150, ${this.alpha})`;
-    this.draw();
-  };
-}
+            this.draw = () => {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(Math.PI / 4);
+                ctx.scale(this.size / 10, this.size / 10);
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.bezierCurveTo(0, -3, -5, -3, -5, 0);
+                ctx.bezierCurveTo(-5, 3, 0, 6, 0, 10);
+                ctx.bezierCurveTo(0, 6, 5, 3, 5, 0);
+                ctx.bezierCurveTo(5, -3, 0, -3, 0, 0);
+                ctx.closePath();
+                ctx.fillStyle = this.color;
+                ctx.fill();
+                ctx.restore();
+            };
 
-function animate() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  if (Math.random() < 0.1) hearts.push(new Heart());
-  for (let i = 0; i < hearts.length; i++) {
-    hearts[i].update();
-    if (hearts[i].alpha <= 0) hearts.splice(i, 1);
-  }
-  requestAnimationFrame(animate);
-}
-animate();
+            this.update = () => {
+                this.y -= this.speed;
+                this.alpha -= 0.002;
+                this.color = `rgba(255, 120, 150, ${this.alpha})`;
+                this.draw();
+            };
+        }
 
-window.addEventListener("resize", () => {
-  canvas.width = innerWidth;
-  canvas.height = innerHeight;
-});
-</script>
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (Math.random() < 0.1) hearts.push(new Heart());
+            for (let i = 0; i < hearts.length; i++) {
+                hearts[i].update();
+                if (hearts[i].alpha <= 0) hearts.splice(i, 1);
+            }
+            requestAnimationFrame(animate);
+        }
+        animate();
 
-<style>
-#heartCanvas {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: -1;
-}
-</style>
-   <footer class="fade-in" style="text-align: center; position: absolute; bottom: 0; width: 100%;">
-    <p>Tumhara,Evaan</p>
-    <p class="small-text">Dedicated with all my heart.</p>
-</footer>
+        window.addEventListener("resize", () => {
+            canvas.width = innerWidth;
+            canvas.height = innerHeight;
+        });
+    </script>
+
+    <style>
+        #heartCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+    </style>
+
+    <footer class="fade-in" style="text-align: center; position: absolute; bottom: 0; width: 100%;">
+        <p>Tumhara, Evaan</p>
+        <p class="small-text">Dedicated with all my heart.</p>
+    </footer>
 
     <script src="script.js"></script>
 </body>
