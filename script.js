@@ -21,3 +21,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+document.addEventListener('DOMContentLoaded', () => {
+    const audio = document.getElementById('bgmusic.mp3');
+    audio.play().catch(e => {
+        console.log("Autoplay was prevented. User must interact to play.");
+    });
+});
