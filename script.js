@@ -5,7 +5,7 @@ const playlistData = {
             title: "Oreo's Jam Track",
             artist: "Vibe Mix",
             // Your exact main GitHub audio file path
-            url: "bgmusic.mp3",
+            url: "music/bgmusic.mp3",
             badge: "🌾"
         },
         {
