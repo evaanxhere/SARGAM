@@ -1,9 +1,10 @@
+/* --- 1. THEME STYLING (Original Color Palette) --- */
 :root {
     --primary-color: #7952b3; /* Original Soft Purple */
     --secondary-color: #ff91a4; /* Original Light Pink */
     --text-dark: #333;
     --text-light: #f4f4f4;
-    --bg-light: #f0f0f5; 
+    --bg-light: #f0f0f5; /* Very light gray-purple */
 }
 
 body {
@@ -15,9 +16,9 @@ body {
     overflow-x: hidden;
 }
 
-/* --- HERO HEADER & PLAYER INTERFACE --- */
+/* --- 2. HERO HEADER & PLAYER INTERFACE --- */
 .hero-section {
-    min-height: 75vh;
+    min-height: 85vh;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -52,7 +53,7 @@ body {
     opacity: 0.9;
 }
 
-/* --- THE CONSOLIDATED MUSIC CONTROLLER DECK --- */
+/* --- 3. THE CONSOLIDATED MUSIC CONTROLLER DECK --- */
 .player-card {
     background: rgba(255, 255, 255, 0.12);
     backdrop-filter: blur(15px);
@@ -207,9 +208,9 @@ body {
     transform: scale(1.06);
 }
 
-/* --- PLAYLIST SECTIONS --- */
+/* --- 4. PLAYLIST SECTIONS --- */
 .story-section {
-    padding: 30px 5%;
+    padding: 60px 5%;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -277,14 +278,14 @@ body {
     color: var(--primary-color);
 }
 
-/* Animations */
+/* --- Animations --- */
 .fade-in {
     opacity: 0;
-    animation: fadeIn 1.5s forwards;
+    animation: fadeIn 2s forwards;
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(15px); }
+    from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
@@ -296,4 +297,3 @@ footer {
     font-size: 0.9rem;
     color: #777;
 }
-
