@@ -3,132 +3,601 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kiddan Doni 🖕🏻</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
-</head>
-<body>
-    <!-- Single audio element with GitHub-hosted MP3 -->
-    <audio id="backgroundMusic" loop>
-        <source src="https://raw.githubusercontent.com/evaanxhere/Message-/refs/heads/main/bgmusic.mp3" type="audio/mpeg">
-        Your browser does not support the audio element.
-    </audio>
-
-    <header class="hero-section">
-        <div class="hero-content">
-            <h1 class="fade-in"> Udekaran don</h1>
-            <p class="fade-in sub-text"> Fadla.</p>
-            <div class="button-container">
-                <button id="playButton" class="play-button">Play Music</button>
-            </div>
-        </div>
-    </header>
-
-    <main>
-        <section class="story-section reveal-on-scroll">
-            <div class="content-box">
-                <p class="quote">"Testing "</p>
-                <h2>Tera Bhai Developer 🔥</h2>
-<p>Just checking my coding skills bro. Yeh dekh tera bhai full stack banne ke raaste pe nikal pada hai. Layout aur CSS check kar bas.</p>
-                
-            </div>
-        </section>
-
-        <section class="story-section reveal-on-scroll reverse">
-            <div class="content-box">
-                <p class="quote">"Testing for don ."</p>
-                <h2>Faltu Ka Content 💀</h2>
-<p>Asli content toh kuch likha nahi hai idhar, bas text bhar diya hai taaki site bhari bhari lage. Animations pe dhyan de, text waise bhi kon padhta hai aaj kal.</p>
-                
-            </div>
-        </section>
-
-        <section class="story-section reveal-on-scroll">
-            <div class="content-box">
-                <p class="quote"> Testing."</p>
-                  <h2>Chal Ab Party De 🍻</h2>
-<p>Website dikha di, code flaunt kar diya, ab chup chaap bahar chal aur khana khila. Aaj ka bill tera bhai, koi excuse nahi chalega.</p>
-                
-                <p class="call-to-action"> bs ahi kuch aa .</p>
-            </div>
-        </section>
-    </main>
-
-    <canvas id="heartCanvas"></canvas>
-    <script>
-        const canvas = document.getElementById("heartCanvas");
-        const ctx = canvas.getContext("2d");
-        canvas.width = innerWidth;
-        canvas.height = innerHeight;
-
-        let hearts = [];
-
-        function Heart() {
-            this.x = Math.random() * canvas.width;
-            this.y = canvas.height + 20;
-            this.size = Math.random() * 12 + 8;
-            this.speed = Math.random() * 1 + 0.5;
-            this.alpha = 1;
-            this.color = `rgba(255, 120, 150, ${this.alpha})`;
-
-            this.draw = () => {
-                ctx.save();
-                ctx.translate(this.x, this.y);
-                ctx.rotate(Math.PI / 4);
-                ctx.scale(this.size / 10, this.size / 10);
-                ctx.beginPath();
-                ctx.moveTo(0, 0);
-                ctx.bezierCurveTo(0, -3, -5, -3, -5, 0);
-                ctx.bezierCurveTo(-5, 3, 0, 6, 0, 10);
-                ctx.bezierCurveTo(0, 6, 5, 3, 5, 0);
-                ctx.bezierCurveTo(5, -3, 0, -3, 0, 0);
-                ctx.closePath();
-                ctx.fillStyle = this.color;
-                ctx.fill();
-                ctx.restore();
-            };
-
-            this.update = () => {
-                this.y -= this.speed;
-                this.alpha -= 0.002;
-                this.color = `rgba(255, 120, 150, ${this.alpha})`;
-                this.draw();
-            };
-        }
-
-        function animate() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            if (Math.random() < 0.1) hearts.push(new Heart());
-            for (let i = 0; i < hearts.length; i++) {
-                hearts[i].update();
-                if (hearts[i].alpha <= 0) hearts.splice(i, 1);
-            }
-            requestAnimationFrame(animate);
-        }
-        animate();
-
-        window.addEventListener("resize", () => {
-            canvas.width = innerWidth;
-            canvas.height = innerHeight;
-        });
-    </script>
-
+    <title>Suno Vibes - My Playlist</title>
+    <!-- Fonts from the original project -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
     <style>
+        /* --- 1. THEME STYLING (Original Color Palette) --- */
+        :root {
+            --primary-color: #7952b3; /* Original Soft Purple */
+            --secondary-color: #ff91a4; /* Original Light Pink */
+            --text-dark: #333;
+            --text-light: #f4f4f4;
+            --bg-light: #f0f0f5; /* Very light gray-purple */
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 0;
+            color: var(--text-dark);
+            background-color: var(--bg-light);
+            overflow-x: hidden;
+        }
+
+        /* --- 2. HERO HEADER & PLAYER INTERFACE --- */
+        .hero-section {
+            min-height: 85vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(45deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: var(--text-light);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            padding: 40px 20px;
+        }
+
+        .hero-content {
+            z-index: 10;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .hero-content h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin: 0 0 10px 0;
+            letter-spacing: 2px;
+            text-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .hero-content .sub-text {
+            font-size: 1.2rem;
+            font-weight: 300;
+            font-style: italic;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        /* --- 3. THE CONSOLIDATED MUSIC CONTROLLER DECK --- */
+        .player-card {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 24px;
+            padding: 25px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            margin: 0 auto;
+        }
+
+        /* Spinning Disc Cover */
+        .disc-wrapper {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 15px auto;
+        }
+
+        .vinyl-disc {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: radial-gradient(circle, #333 0%, #111 50%, #000 80%);
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2.5rem;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .vinyl-sticker {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1rem;
+            color: white;
+            box-shadow: 0 0 5px rgba(0,0,0,0.5);
+        }
+
+        /* Disc rotation logic */
+        .spinning {
+            animation: rotateDisk 5s linear infinite;
+        }
+
+        @keyframes rotateDisk {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Metadata & Seeker */
+        .now-playing-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .now-playing-artist {
+            font-size: 0.9rem;
+            font-style: italic;
+            opacity: 0.8;
+            margin-bottom: 20px;
+        }
+
+        .timeline-container {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.25);
+            border-radius: 10px;
+            cursor: pointer;
+            position: relative;
+            margin-bottom: 8px;
+        }
+
+        .timeline-filled {
+            height: 100%;
+            background: var(--text-light);
+            border-radius: 10px;
+            width: 0%;
+            position: relative;
+        }
+
+        .timeline-filled::after {
+            content: '';
+            position: absolute;
+            right: -5px;
+            top: -3px;
+            width: 12px;
+            height: 12px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        .time-stamps {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            opacity: 0.8;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+
+        /* Controls Block */
+        .playback-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .control-btn {
+            background: transparent;
+            border: 2px solid white;
+            color: white;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .control-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: scale(1.08);
+        }
+
+        .control-btn.play-toggle {
+            background-color: white;
+            color: var(--primary-color);
+            width: 55px;
+            height: 55px;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+
+        .control-btn.play-toggle:hover {
+            background-color: var(--bg-light);
+            color: var(--primary-color);
+            transform: scale(1.06);
+        }
+
+        /* --- 4. PLAYLIST SECTIONS (Scroll reveals from original style) --- */
+        .story-section {
+            padding: 60px 5%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: opacity 1s ease-out, transform 1s ease-out;
+        }
+
+        .story-section.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .content-box {
+            width: 100%;
+            max-width: 600px;
+            background-color: white;
+            padding: 35px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            border-left: 5px solid var(--primary-color);
+        }
+
+        .content-box h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        /* Song row inside content boxes */
+        .song-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-bottom: 8px;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+
+        .song-item:hover {
+            background-color: rgba(121, 82, 179, 0.05);
+            border-color: rgba(121, 82, 179, 0.1);
+        }
+
+        .song-item.active {
+            background-color: rgba(121, 82, 179, 0.08);
+            border-color: rgba(121, 82, 179, 0.2);
+            font-weight: 600;
+        }
+
+        .song-title-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-align: left;
+        }
+
+        .song-badge {
+            font-size: 1.2rem;
+        }
+
+        .song-meta {
+            font-size: 0.85rem;
+            color: #777;
+        }
+
+        .song-item.active .song-title-row {
+            color: var(--primary-color);
+        }
+
+        /* --- Animations --- */
+        .fade-in {
+            opacity: 0;
+            animation: fadeIn 2s forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         #heartCanvas {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: -1;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            background: white;
+            border-top: 1px solid rgba(0,0,0,0.05);
+            font-size: 0.9rem;
+            color: #777;
         }
     </style>
+</head>
+<body>
 
-    <footer class="fade-in" style="text-align: center; position: absolute; bottom: 0; width: 100%;">
-        <p>Evaan</p>
-        <p class="small-text"> 🖕🏻.</p>
+    <!-- Core Audio Engine -->
+    <audio id="mainAudio" loop></audio>
+
+    <!-- Floating Canvas Animation Backdrop -->
+    <canvas id="heartCanvas"></canvas>
+
+    <!-- Interactive Hero Controller -->
+    <header class="hero-section">
+        <div class="hero-content">
+            <h1 class="fade-in">Suno Vibes 🎧</h1>
+            <p class="fade-in sub-text">Select any song below to start playing!</p>
+            
+            <!-- Music Deck Unit -->
+            <div class="player-card fade-in">
+                
+                <!-- Rotating Vinyl disk -->
+                <div class="disc-wrapper">
+                    <div id="vinylDisk" class="vinyl-disc">
+                        <div class="vinyl-sticker" id="stickerEmoji">🎵</div>
+                    </div>
+                </div>
+
+                <!-- Song Labels -->
+                <div class="now-playing-title" id="playerTitle">No Song Playing</div>
+                <div class="now-playing-artist" id="playerArtist">Select a song below</div>
+
+                <!-- Timeline seeker -->
+                <div class="timeline-container" id="timelineContainer">
+                    <div class="timeline-filled" id="timelineFilled"></div>
+                </div>
+                <div class="time-stamps">
+                    <span id="timeCurrent">0:00</span>
+                    <span id="timeTotal">0:00</span>
+                </div>
+
+                <!-- Deck Navigation controllers -->
+                <div class="playback-controls">
+                    <button class="control-btn" onclick="playPrev()"><</button>
+                    <button class="control-btn play-toggle" id="playButton" onclick="togglePlay()">▶</button>
+                    <button class="control-btn" onclick="playNext()">></button>
+                </div>
+
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- PLAYLIST 1: Punjabi Tracks -->
+        <section class="story-section reveal-on-scroll">
+            <div class="content-box">
+                <h2>Punjabi Beats 🌾</h2>
+                <div id="playlist-punjabi">
+                    <!-- Populated via JavaScript dynamically -->
+                </div>
+            </div>
+        </section>
+
+        <!-- PLAYLIST 2: 90s Bollywood Nostalgia -->
+        <section class="story-section reveal-on-scroll">
+            <div class="content-box">
+                <h2>Bollywood 90s 🎬</h2>
+                <div id="playlist-bollywood">
+                    <!-- Populated via JavaScript dynamically -->
+                </div>
+            </div>
+        </section>
+
+        <!-- PLAYLIST 3: English / Old Chill Vibes -->
+        <section class="story-section reveal-on-scroll">
+            <div class="content-box">
+                <h2>Old Punjabi / English 🎧</h2>
+                <div id="playlist-english">
+                    <!-- Populated via JavaScript dynamically -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>Private Custom Player Dashboard</p>
+        <p style="font-size: 0.75rem; margin-top: 5px;">Created with Retro Aesthetic Theme</p>
     </footer>
 
-    <script src="script.js"></script>
-</body>
-</html>
+    <!-- Playback controller script & Canvas dynamics -->
+    <script>
+        // --- 1. YOUR COMPILATION PLAYLIST DATA ---
+        // Bhai, you can change the urls, titles, and artists to anything you like here!
+        const playlistData = {
+            punjabi: [
+                {
+                    title: "Oreo's Jam Track",
+                    artist: "Vibe Mix",
+                    // Pulling directly from your raw GitHub URL track!
+                    url: "https://raw.githubusercontent.com/evaanxhere/Message-/refs/heads/main/bgmusic.mp3",
+                    badge: "🌾"
+                },
+                {
+                    title: "Dil Nu lofi beats",
+                    artist: "Aesthetic Instrumental",
+                    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+                    badge: "🔥"
+                },
+                {
+                    title: "Late Night Geri",
+                    artist: "Punjabi Lo-fi Loop",
+                    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+                    badge: "🚗"
+                }
+            ],
+            bollywood: [
+                {
+                    title: "Chura Ke Dil Mera lofi",
+                    artist: "Nostalgia Instrumental Reverb",
+                    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
+                    badge: "🥀"
+                },
+                {
+                    title: "Tum Mile Chill Mix",
+                    artist: "Rainy Afternoon Lofi",
+                    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3",
+                    badge: "☔"
+                }
+            ],
+            english: [
+                {
+                    title: "Late Night Coffee",
+                    artist: "English Lo-fi Beats",
+                    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3",
+                    badge: "☕"
+                },
+                {
+                    title: "Sunset Boulevard Drive",
+                    artist: "Chill Dreamy Indie Synth",
+                    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3",
+                    badge: "🌅"
+                }
+            ]
+        };
+
+        // State trackers
+        let activeCategory = 'punjabi';
+        let activeSongIndex = 0;
+        let isPlaying = false;
+
+        // Elements
+        const audio = document.getElementById('mainAudio');
+        const playButton = document.getElementById('playButton');
+        const vinylDisk = document.getElementById('vinylDisk');
+        const stickerEmoji = document.getElementById('stickerEmoji');
+        const playerTitle = document.getElementById('playerTitle');
+        const playerArtist = document.getElementById('playerArtist');
+        const timelineFilled = document.getElementById('timelineFilled');
+        const timelineContainer = document.getElementById('timelineContainer');
+        const timeCurrent = document.getElementById('timeCurrent');
+        const timeTotal = document.getElementById('timeTotal');
+
+        // Initial setup
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSong('punjabi', 0, false);
+            renderAllPlaylists();
+            setupScrollReveal();
+            setupCanvasAnimation();
+        });
+
+        // Load a selected song
+        function loadSong(category, index, autoplay = true) {
+            activeCategory = category;
+            activeSongIndex = index;
+            const song = playlistData[category][index];
+
+            audio.src = song.url;
+            playerTitle.textContent = song.title;
+            playerArtist.textContent = song.artist;
+            stickerEmoji.textContent = song.badge || "🎵";
+
+            // Reset Seekers
+            timelineFilled.style.width = '0%';
+            timeCurrent.textContent = "0:00";
+            timeTotal.textContent = "0:00";
+
+            // Highlight in tracklist
+            updateActiveHighlight();
+
+            if (autoplay) {
+                audio.play()
+                    .then(() => {
+                        isPlaying = true;
+                        playButton.textContent = "⏸";
+                        vinylDisk.classList.add('spinning');
+                    })
+                    .catch(err => console.log("Playback engine block:", err));
+            }
+        }
+
+        // Toggle Play and Pause
+        function togglePlay() {
+            if (isPlaying) {
+                audio.pause();
+                playButton.textContent = "▶";
+                vinylDisk.classList.remove('spinning');
+                isPlaying = false;
+            } else {
+                audio.play()
+                    .then(() => {
+                        isPlaying = true;
+                        playButton.textContent = "⏸";
+                        vinylDisk.classList.add('spinning');
+                    })
+                    .catch(err => {
+                        console.error('Interactivity block:', err);
+                    });
+            }
+            updateActiveHighlight();
+        }
+
+        // Play Next Song (loops through the active list)
+        function playNext() {
+            const list = playlistData[activeCategory];
+            let nextIdx = activeSongIndex + 1;
+            if (nextIdx >= list.length) nextIdx = 0;
+            loadSong(activeCategory, nextIdx, isPlaying);
+        }
+
+        // Play Prev Song
+        function playPrev() {
+            const list = playlistData[activeCategory];
+            let prevIdx = activeSongIndex - 1;
+            if (prevIdx < 0) prevIdx = list.length - 1;
+            loadSong(activeCategory, prevIdx, isPlaying);
+        }
+
+        // Render dynamic tracks inside cards
+        function renderAllPlaylists() {
+            Object.keys(playlistData).forEach(category => {
+                const container = document.getElementById(`playlist-${category}`);
+                container.innerHTML = "";
+
+                playlistData[category].forEach((song, index) => {
+                    const row = document.createElement('div');
+                    row.className = `song-item cat-${category} idx-${index}`;
+                    row.onclick = () => {
+                        loadSong(category, index, true);
+                    };
+
+                    const leftDiv = document.createElement('div');
+                    leftDiv.className = 'song-title-row';
+                    leftDiv.innerHTML = `<span class="song-badge">${song.badge}</span> <div>${song.title}</div>`;
+
+                    const rightDiv = document.createElement('div');
+                    rightDiv.className = 'song-meta';
+                    rightDiv.textContent = `Track ${index + 1}`;
+
+                    row.appendChild(leftDiv);
+                    row.appendChild(rightDiv);
+                    container.appendChild(row);
+                });
+            });
+            updateActiveHighlight();
+        }
+
+        // Highlight selected song row
+        function updateActiveHighlight() {
+            document.querySelectorAll('.song-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            const activeRow = document.querySelector(`.song-item.cat-${activeCategory}.idx-${activeSongIndex}`);
+            if (activeRow) {
+                activeRow.classList.add('active');
+                if (isPlaying) {
+                    const meta = activeRow.querySelector('.song-meta');
+                    if (meta) meta.innerHTML = `<span style="color:var(--primary-color);">Playing ⚡</span>`;
+             
