@@ -83,11 +83,17 @@ function resizeNebula() {
     buildNebulaClouds();
 }
 
+// Add this new stars array near top with other globals (after nebulaClouds = [])
+const stars = [];
+
+// Replace buildNebulaClouds
 function buildNebulaClouds() {
     nebulaClouds.length = 0;
+    stars.length = 0;  // reset stars
     const W = nebCanvas.width;
     const H = nebCanvas.height;
-    // 5 large soft nebula blobs
+    
+    // Nebula clouds
     const positions = [
         { x: 0.5, y: 0.15, r: 0.55 },
         { x: 0.15, y: 0.6,  r: 0.40 },
@@ -100,9 +106,20 @@ function buildNebulaClouds() {
             x: p.x * W, y: p.y * H,
             baseR: p.r * Math.min(W, H),
             phase: Math.random() * Math.PI * 2,
-            speed: 0.0003 + Math.random() * 0.0004
+            speed: 0.00025 + Math.random() * 0.0003
         });
     });
+
+    // ✨ Twinkling stars for premium depth
+    for (let i = 0; i < 220; i++) {
+        stars.push({
+            x: Math.random() * W,
+            y: Math.random() * H,
+            size: Math.random() * 1.6 + 0.5,
+            alpha: Math.random() * 0.7 + 0.4,
+            speed: Math.random() * 0.018 + 0.007
+        });
+    }
 }
 
 function drawNebula(ts) {
@@ -110,33 +127,37 @@ function drawNebula(ts) {
     const H = nebCanvas.height;
     nebCtx.clearRect(0, 0, W, H);
 
-    // Deep space base gradient
-    const bg = nebCtx.createRadialGradient(W/2, 0, 0, W/2, H/2, Math.max(W,H)*0.8);
-    bg.addColorStop(0,   `rgba(${currentMoodRgb},0.06)`);
-    bg.addColorStop(0.5, `rgba(${currentMoodRgb},0.02)`);
-    bg.addColorStop(1,   'rgba(3,2,10,0)');
+    // Deeper space gradient
+    const bg = nebCtx.createRadialGradient(W/2, H*0.35, 0, W/2, H*0.9, Math.max(W,H)*1.15);
+    bg.addColorStop(0, `rgba(${currentMoodRgb},0.11)`);
+    bg.addColorStop(0.45, `rgba(12,9,28,0.75)`);
+    bg.addColorStop(1, '#020106');
     nebCtx.fillStyle = bg;
     nebCtx.fillRect(0, 0, W, H);
 
-    // Nebula clouds
+    // Twinkling stars
+    stars.forEach((s, i) => {
+        const twinkle = Math.sin(Date.now() * s.speed * 0.001 + i) * 0.5 + 0.5;
+        nebCtx.fillStyle = `rgba(245,245,255,${s.alpha * twinkle})`;
+        nebCtx.fillRect(s.x, s.y, s.size, s.size);
+    });
+
+    // Enhanced nebula clouds
     nebulaClouds.forEach((c, i) => {
         c.phase += c.speed;
-        const breathe = 1 + 0.06 * Math.sin(c.phase);
-        // Beat scale only on first 2 clouds (main visual impact)
-        const beat = i < 2 ? nebulaScale : 1 + (nebulaScale - 1) * 0.4;
+        const breathe = 1 + 0.085 * Math.sin(c.phase * 1.15);
+        const beat = i < 2 ? nebulaScale * 1.2 : 1 + (nebulaScale - 1) * 0.55;
         const r = c.baseR * breathe * beat;
 
-        const grad = nebCtx.createRadialGradient(c.x, c.y, 0, c.x, c.y, r);
-        grad.addColorStop(0,   `rgba(${currentMoodRgb},0.055)`);
-        grad.addColorStop(0.4, `rgba(${currentMoodRgb},0.025)`);
-        grad.addColorStop(1,   'rgba(0,0,0,0)');
+        const grad = nebCtx.createRadialGradient(c.x, c.y, r*0.18, c.x, c.y, r * 1.1);
+        grad.addColorStop(0, `rgba(${currentMoodRgb},0.09)`);
+        grad.addColorStop(0.4, `rgba(${currentMoodRgb},0.038)`);
+        grad.addColorStop(1, 'rgba(6,4,22,0)');
         nebCtx.fillStyle = grad;
         nebCtx.fillRect(0, 0, W, H);
     });
 
-    // Ease beat scale back to 1
-    nebulaScale += (1 - nebulaScale) * 0.06;
-
+    nebulaScale += (1 - nebulaScale) * 0.09;
     requestAnimationFrame(drawNebula);
 }
 
