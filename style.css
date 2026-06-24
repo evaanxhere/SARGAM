@@ -1,107 +1,224 @@
-/* --- 1. THEME STYLING (Original Color Palette) --- */
+/* ============================================
+   SUNO VIBES — COSMIC DARK GALAXY THEME
+   ============================================ */
+
+/* --- TOKENS --- */
 :root {
-    --primary-color: #7952b3; /* Original Soft Purple */
-    --secondary-color: #ff91a4; /* Original Light Pink */
-    --text-dark: #333;
-    --text-light: #f4f4f4;
-    --bg-light: #f0f0f5; /* Very light gray-purple */
+    --bg-void: #050508;
+    --bg-deep: #0a0a12;
+    --bg-card: rgba(255, 255, 255, 0.04);
+    --border-glow: rgba(255, 255, 255, 0.08);
+
+    /* Mood: Default / Cosmic */
+    --mood-primary: #a78bfa;
+    --mood-secondary: #7c3aed;
+    --mood-glow: rgba(167, 139, 250, 0.35);
+    --mood-label: "🌌 Deep Space";
+
+    /* Punjabi: Golden Harvest */
+    --punjabi-primary: #f59e0b;
+    --punjabi-secondary: #d97706;
+    --punjabi-glow: rgba(245, 158, 11, 0.35);
+
+    /* Bollywood: Rose Cinema */
+    --bollywood-primary: #f43f5e;
+    --bollywood-secondary: #be123c;
+    --bollywood-glow: rgba(244, 63, 94, 0.35);
+
+    /* English: Ocean Neon */
+    --english-primary: #22d3ee;
+    --english-secondary: #0e7490;
+    --english-glow: rgba(34, 211, 238, 0.35);
+
+    --text-bright: #f0f0ff;
+    --text-dim: rgba(240, 240, 255, 0.5);
+    --font-display: 'Orbitron', monospace;
+    --font-body: 'Inter', sans-serif;
 }
+
+/* --- RESET & BASE --- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-    font-family: 'Montserrat', sans-serif;
-    margin: 0;
-    padding: 0;
-    color: var(--text-dark);
-    background-color: var(--bg-light);
+    font-family: var(--font-body);
+    background-color: var(--bg-void);
+    color: var(--text-bright);
     overflow-x: hidden;
+    min-height: 100vh;
 }
 
-/* --- 2. HERO HEADER & PLAYER INTERFACE --- */
+/* --- STARFIELD CANVAS --- */
+#starCanvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* --- MOOD OVERLAY (colored atmospheric fog) --- */
+.mood-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 1;
+    pointer-events: none;
+    background: radial-gradient(ellipse at 50% 0%, var(--mood-glow) 0%, transparent 70%);
+    transition: background 1.2s ease;
+}
+
+/* --- HERO --- */
 .hero-section {
-    min-height: 85vh;
+    position: relative;
+    z-index: 10;
+    min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    background: linear-gradient(45deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-    color: var(--text-light);
-    text-align: center;
-    position: relative;
-    overflow: hidden;
     padding: 40px 20px;
 }
 
 .hero-content {
-    z-index: 10;
     width: 100%;
-    max-width: 500px;
+    max-width: 480px;
+    text-align: center;
 }
 
-.hero-content h1 {
-    font-family: 'Playfair Display', serif;
-    font-size: 3.5rem;
-    font-weight: 700;
-    margin: 0 0 10px 0;
-    letter-spacing: 2px;
-    text-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+/* --- BRAND --- */
+.brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    margin-bottom: 10px;
 }
 
-.hero-content .sub-text {
-    font-size: 1.2rem;
-    font-weight: 300;
-    font-style: italic;
+.brand h1 {
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 6vw, 2.4rem);
+    font-weight: 900;
+    letter-spacing: 0.2em;
+    color: var(--text-bright);
+    text-shadow: 0 0 30px var(--mood-glow), 0 0 60px var(--mood-glow);
+    transition: text-shadow 1.2s ease;
+}
+
+.brand-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--mood-primary);
+    box-shadow: 0 0 12px var(--mood-primary), 0 0 24px var(--mood-primary);
+    transition: background 1.2s ease, box-shadow 1.2s ease;
+    animation: dotPulse 2s ease-in-out infinite;
+}
+
+@keyframes dotPulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.4); opacity: 0.7; }
+}
+
+.sub-text {
+    font-size: 0.85rem;
+    letter-spacing: 0.1em;
+    color: var(--text-dim);
     margin-bottom: 30px;
-    opacity: 0.9;
+    font-weight: 300;
+    transition: color 0.6s ease;
 }
 
-/* --- 3. THE CONSOLIDATED MUSIC CONTROLLER DECK --- */
+/* --- PLAYER CARD --- */
 .player-card {
-    background: rgba(255, 255, 255, 0.12);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 24px;
-    padding: 25px;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-    margin: 0 auto;
+    background: var(--bg-card);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid var(--border-glow);
+    border-radius: 28px;
+    padding: 28px 24px 24px;
+    box-shadow:
+        0 0 0 1px var(--border-glow),
+        0 20px 60px rgba(0,0,0,0.6),
+        0 0 80px var(--mood-glow);
+    transition: box-shadow 1.2s ease;
+    position: relative;
+    overflow: hidden;
 }
 
-/* Spinning Disc Cover */
-.disc-wrapper {
+.player-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--mood-primary), transparent);
+    transition: background 1.2s ease;
+}
+
+/* --- VISUALIZER + DISC WRAPPER --- */
+.visualizer-wrapper {
     position: relative;
-    width: 120px;
-    height: 120px;
-    margin: 0 auto 15px auto;
+    width: 160px;
+    height: 160px;
+    margin: 0 auto 20px;
+}
+
+#visualizerCanvas {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+}
+
+.disc-wrapper {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 110px;
+    height: 110px;
 }
 
 .vinyl-disc {
     width: 100%;
     height: 100%;
     border-radius: 50%;
-    background: radial-gradient(circle, #333 0%, #111 50%, #000 80%);
-    border: 4px solid rgba(255, 255, 255, 0.3);
+    background: radial-gradient(circle at 35% 35%, #1a1a2e 0%, #0a0a14 60%, #000 100%);
+    border: 2px solid rgba(255,255,255,0.1);
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 2.5rem;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    box-shadow:
+        0 0 0 8px rgba(255,255,255,0.02),
+        0 0 0 16px rgba(255,255,255,0.015),
+        0 8px 30px rgba(0,0,0,0.6);
+    position: relative;
+}
+
+.vinyl-inner-ring {
+    position: absolute;
+    width: 75%;
+    height: 75%;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.06);
 }
 
 .vinyl-sticker {
-    width: 40px;
-    height: 40px;
+    width: 38px;
+    height: 38px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+    background: linear-gradient(135deg, var(--mood-secondary), var(--mood-primary));
     display: flex;
     justify-content: center;
     align-items: center;
     font-size: 1rem;
-    color: white;
-    box-shadow: 0 0 5px rgba(0,0,0,0.5);
+    box-shadow: 0 0 16px var(--mood-glow);
+    transition: background 1.2s ease, box-shadow 1.2s ease;
+    position: relative;
+    z-index: 2;
 }
 
-/* Disc rotation logic */
 .spinning {
-    animation: rotateDisk 5s linear infinite;
+    animation: rotateDisk 4s linear infinite;
 }
 
 @keyframes rotateDisk {
@@ -109,153 +226,228 @@ body {
     100% { transform: rotate(360deg); }
 }
 
-/* Metadata & Seeker */
-.now-playing-title {
-    font-size: 1.3rem;
-    font-weight: 700;
-    margin-bottom: 5px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.now-playing-artist {
-    font-size: 0.9rem;
-    font-style: italic;
-    opacity: 0.8;
+/* --- TRACK INFO --- */
+.track-info {
     margin-bottom: 20px;
 }
 
+.now-playing-title {
+    font-family: var(--font-display);
+    font-size: clamp(0.85rem, 3vw, 1rem);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 6px;
+    color: var(--text-bright);
+}
+
+.now-playing-artist {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    font-style: italic;
+    font-weight: 300;
+}
+
+/* --- TIMELINE --- */
 .timeline-container {
     width: 100%;
-    height: 6px;
-    background: rgba(255, 255, 255, 0.25);
+    height: 4px;
+    background: rgba(255, 255, 255, 0.08);
     border-radius: 10px;
     cursor: pointer;
     position: relative;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
 }
 
 .timeline-filled {
     height: 100%;
-    background: var(--text-light);
+    background: linear-gradient(90deg, var(--mood-secondary), var(--mood-primary));
     border-radius: 10px;
     width: 0%;
     position: relative;
+    transition: background 1.2s ease;
 }
 
 .timeline-filled::after {
     content: '';
     position: absolute;
     right: -5px;
-    top: -3px;
+    top: -4px;
     width: 12px;
     height: 12px;
-    background: white;
+    background: var(--mood-primary);
     border-radius: 50%;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    box-shadow: 0 0 8px var(--mood-primary);
+    transition: background 1.2s ease, box-shadow 1.2s ease;
 }
 
 .time-stamps {
     display: flex;
     justify-content: space-between;
-    font-size: 0.75rem;
-    opacity: 0.8;
-    font-weight: 500;
-    margin-bottom: 20px;
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    margin-bottom: 22px;
+    letter-spacing: 0.05em;
 }
 
-/* Controls Block */
+/* --- CONTROLS --- */
 .playback-controls {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 20px;
+    gap: 16px;
 }
 
 .control-btn {
-    background: transparent;
-    border: 2px solid white;
-    color: white;
-    width: 45px;
-    height: 45px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--text-bright);
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
-    font-size: 1rem;
+    font-size: 0.8rem;
     cursor: pointer;
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: all 0.3s ease;
+    transition: all 0.25s ease;
+    letter-spacing: -1px;
 }
 
 .control-btn:hover {
-    background-color: rgba(255, 255, 255, 0.2);
-    transform: scale(1.08);
-}
-
-.control-btn.play-toggle {
-    background-color: white;
-    color: var(--primary-color);
-    width: 55px;
-    height: 55px;
-    font-size: 1.2rem;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-}
-
-.control-btn.play-toggle:hover {
-    background-color: var(--bg-light);
-    color: var(--primary-color);
+    background: rgba(255,255,255,0.1);
+    border-color: var(--mood-primary);
+    box-shadow: 0 0 12px var(--mood-glow);
     transform: scale(1.06);
 }
 
-/* --- 4. PLAYLIST SECTIONS --- */
-.story-section {
-    padding: 60px 5%;
+.control-btn.play-toggle {
+    background: linear-gradient(135deg, var(--mood-secondary), var(--mood-primary));
+    border: none;
+    width: 58px;
+    height: 58px;
+    font-size: 1.1rem;
+    box-shadow: 0 0 20px var(--mood-glow), 0 4px 16px rgba(0,0,0,0.4);
+    transition: all 0.25s ease, background 1.2s ease, box-shadow 1.2s ease;
+    letter-spacing: 0;
+}
+
+.control-btn.play-toggle:hover {
+    transform: scale(1.08);
+    box-shadow: 0 0 32px var(--mood-glow), 0 4px 16px rgba(0,0,0,0.4);
+}
+
+/* --- MOOD BANNER --- */
+.mood-banner {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    padding: 10px 20px;
+    margin: 0;
+}
+
+#moodBannerText {
+    font-family: var(--font-display);
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    color: var(--mood-primary);
+    text-transform: uppercase;
+    transition: color 1.2s ease;
+}
+
+/* --- MAIN PLAYLIST SECTIONS --- */
+main {
+    position: relative;
+    z-index: 10;
+    padding: 20px 16px 60px;
+    max-width: 640px;
+    margin: 0 auto;
+}
+
+.playlist-section {
+    margin-bottom: 36px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 20px;
+    padding: 24px 20px;
+    backdrop-filter: blur(10px);
+}
+
+.section-header {
     display: flex;
-    justify-content: center;
     align-items: center;
-}
-
-.content-box {
-    width: 100%;
-    max-width: 600px;
-    background-color: white;
-    padding: 35px;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-    border-left: 5px solid var(--primary-color);
-}
-
-.content-box h2 {
-    font-family: 'Playfair Display', serif;
-    font-size: 2rem;
-    color: var(--primary-color);
-    margin-top: 0;
+    gap: 12px;
     margin-bottom: 20px;
 }
 
-/* Song row inside content boxes */
+.section-icon {
+    font-size: 1.4rem;
+}
+
+.section-header h2 {
+    font-family: var(--font-display);
+    font-size: clamp(0.85rem, 3vw, 1rem);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    flex: 1;
+}
+
+.section-tag {
+    font-family: var(--font-display);
+    font-size: 0.55rem;
+    letter-spacing: 0.2em;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: 700;
+}
+
+.mood-punjabi-tag {
+    background: rgba(245, 158, 11, 0.15);
+    color: var(--punjabi-primary);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+.mood-bollywood-tag {
+    background: rgba(244, 63, 94, 0.15);
+    color: var(--bollywood-primary);
+    border: 1px solid rgba(244, 63, 94, 0.3);
+}
+.mood-english-tag {
+    background: rgba(34, 211, 238, 0.15);
+    color: var(--english-primary);
+    border: 1px solid rgba(34, 211, 238, 0.3);
+}
+
+/* --- SONG ITEMS --- */
+.playlist-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
 .song-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 15px;
-    border-radius: 10px;
+    padding: 12px 14px;
+    border-radius: 12px;
     cursor: pointer;
-    margin-bottom: 8px;
-    transition: all 0.2s ease;
     border: 1px solid transparent;
+    transition: all 0.2s ease;
+    background: transparent;
 }
 
 .song-item:hover {
-    background-color: rgba(121, 82, 179, 0.05);
-    border-color: rgba(121, 82, 179, 0.1);
+    background: rgba(255,255,255,0.04);
+    border-color: rgba(255,255,255,0.07);
 }
 
 .song-item.active {
-    background-color: rgba(121, 82, 179, 0.08);
-    border-color: rgba(121, 82, 179, 0.2);
-    font-weight: 600;
+    background: rgba(255,255,255,0.06);
+    border-color: var(--mood-primary);
+    box-shadow: 0 0 16px var(--mood-glow);
+    transition: border-color 1.2s ease, box-shadow 1.2s ease;
 }
 
 .song-title-row {
@@ -263,37 +455,111 @@ body {
     align-items: center;
     gap: 12px;
     text-align: left;
+    overflow: hidden;
 }
 
 .song-badge {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+.song-title-text {
+    font-size: 0.88rem;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--text-bright);
+}
+
+.song-item.active .song-title-text {
+    color: var(--mood-primary);
+    transition: color 1.2s ease;
 }
 
 .song-meta {
-    font-size: 0.85rem;
-    color: #777;
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    flex-shrink: 0;
+    margin-left: 10px;
+    font-family: var(--font-display);
+    letter-spacing: 0.05em;
 }
 
-.song-item.active .song-title-row {
-    color: var(--primary-color);
+/* --- FOOTER --- */
+footer {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    padding: 40px 20px;
+    border-top: 1px solid rgba(255,255,255,0.04);
 }
 
-/* --- Animations --- */
+.footer-glow {
+    position: absolute;
+    top: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--mood-primary), transparent);
+    transition: background 1.2s ease;
+}
+
+.footer-brand {
+    font-family: var(--font-display);
+    font-size: 0.8rem;
+    letter-spacing: 0.3em;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+}
+
+.footer-sub {
+    font-size: 0.72rem;
+    color: rgba(255,255,255,0.2);
+}
+
+/* --- ANIMATIONS --- */
 .fade-in {
     opacity: 0;
-    animation: fadeIn 2s forwards;
+    animation: fadeUp 1s forwards;
+}
+.fade-in:nth-child(1) { animation-delay: 0.1s; }
+.fade-in:nth-child(2) { animation-delay: 0.3s; }
+.fade-in:nth-child(3) { animation-delay: 0.5s; }
+
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+/* --- MOOD TRANSITIONS (applied via JS class on body) --- */
+body.mood-punjabi {
+    --mood-primary: var(--punjabi-primary);
+    --mood-secondary: var(--punjabi-secondary);
+    --mood-glow: var(--punjabi-glow);
+}
+body.mood-bollywood {
+    --mood-primary: var(--bollywood-primary);
+    --mood-secondary: var(--bollywood-secondary);
+    --mood-glow: var(--bollywood-glow);
+}
+body.mood-english {
+    --mood-primary: var(--english-primary);
+    --mood-secondary: var(--english-secondary);
+    --mood-glow: var(--english-glow);
 }
 
-footer {
-    text-align: center;
-    padding: 30px;
-    background: white;
-    border-top: 1px solid rgba(0,0,0,0.05);
-    font-size: 0.9rem;
-    color: #777;
+/* --- RESPONSIVE --- */
+@media (max-width: 480px) {
+    .player-card { padding: 22px 16px 20px; }
+    .hero-section { padding: 30px 16px; }
+    main { padding: 16px 12px 50px; }
+    .playlist-section { padding: 18px 14px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .spinning { animation: none; }
+    .fade-in { animation: none; opacity: 1; }
+    #starCanvas { display: none; }
+    .brand-dot { animation: none; }
 }
