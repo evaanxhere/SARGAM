@@ -37,7 +37,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 html { scroll-behavior: smooth; }
 body {
     font-family: var(--fb);
-    background: var(--void);
+    background: #020106;   /* ← Change this */
     color: var(--txt);
     overflow-x: hidden;
     min-height: 100vh;
@@ -122,12 +122,12 @@ body {
     font-family: var(--fd);
     font-size: clamp(1.8rem, 7vw, 2.8rem);
     font-weight: 900;
-    letter-spacing: 0.18em;
+    letter-spacing: 0.24em;
     color: var(--txt);
     text-shadow:
-        0 0 20px var(--m0),
-        0 0 60px var(--mg),
-        0 0 100px var(--ms);
+        0 0 35px var(--m0),
+        0 0 80px var(--mg),
+        0 0 140px var(--ms);
     transition: text-shadow 1.4s ease;
 }
 
@@ -164,19 +164,19 @@ body {
 .player-card {
     width: 100%;
     max-width: 360px;
-    background: var(--glass);
-    backdrop-filter: blur(32px);
-    -webkit-backdrop-filter: blur(32px);
-    border: 1px solid var(--rim);
+    background: rgba(255,255,255,0.026);
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+    border: 1px solid rgba(255,255,255,0.11);
     border-radius: 32px;
     padding: 32px 28px 28px;
     position: relative;
     overflow: hidden;
     box-shadow:
-        0 0 0 1px rgba(255,255,255,0.04),
-        0 32px 80px rgba(0,0,0,0.7),
-        0 0 60px var(--mg),
-        inset 0 1px 0 rgba(255,255,255,0.08);
+        0 0 0 1px rgba(255,255,255,0.08),
+        0 45px 100px rgba(0,0,0,0.8),
+        0 0 80px var(--mg),
+        inset 0 1.5px 0 rgba(255,255,255,0.12);
     transition: box-shadow 1.4s ease;
 }
 
@@ -454,24 +454,23 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 11px 13px;
-    border-radius: 13px;
+    padding: 12px 14px;
+    border-radius: 14px;
     cursor: pointer;
     border: 1px solid transparent;
-    transition: background 0.2s ease, border-color 0.2s ease,
-                transform 0.15s ease, box-shadow 0.2s ease;
-    /* Magnetic hover — JS handles the translate */
+    transition: all 0.28s cubic-bezier(0.23, 1, 0.32, 1);
     will-change: transform;
 }
 .song-item:hover {
-    background: rgba(255,255,255,0.04);
-    border-color: rgba(255,255,255,0.06);
+    background: rgba(255,255,255,0.055);
+    border-color: rgba(255,255,255,0.1);
+    transform: translateX(8px) scale(1.012);
+    box-shadow: 0 0 28px var(--ms);
 }
 .song-item.active {
     background: var(--ms);
     border-color: var(--m0);
-    box-shadow: 0 0 18px var(--ms);
-    transition: background 1.2s ease, border-color 1.2s ease, box-shadow 1.2s ease;
+    box-shadow: 0 0 22px var(--ms);
 }
 
 .song-left {
