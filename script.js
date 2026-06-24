@@ -56,9 +56,9 @@ const playlistData = {
 
 // --- 2. MOOD CONFIG ---
 const moodConfig = {
-    punjabi:   { label: "🌾 Golden Harvest — Punjabi Beats", class: "mood-punjabi",   color: "#f59e0b", glow: "rgba(245,158,11,0.35)" },
-    bollywood: { label: "🎬 Rose Cinema — Bollywood 90s",    class: "mood-bollywood", color: "#f43f5e", glow: "rgba(244,63,94,0.35)"  },
-    english:   { label: "🎧 Ocean Neon — Old / English",     class: "mood-english",   color: "#22d3ee", glow: "rgba(34,211,238,0.35)" }
+    Bollywood:   { label: "🌾 Golden Harvest — Punjabi Beats", class: "mood-punjabi",   color: "#f59e0b", glow: "rgba(245,158,11,0.35)" },
+    Punjabi: { label: "🎬 Rose Cinema — Bollywood 90s",    class: "mood-bollywood", color: "#f43f5e", glow: "rgba(244,63,94,0.35)"  },
+    English:   { label: "🎧 Ocean Neon — Old / English",     class: "mood-english",   color: "#22d3ee", glow: "rgba(34,211,238,0.35)" }
 };
 
 // --- 3. BUILD GLOBAL PLAYLIST ---
