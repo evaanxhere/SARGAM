@@ -14,7 +14,7 @@ const playlistData = {
         {
             title: "Dil Nu Lofi Beats",
             artist: "Aesthetic Instrumental",
-            url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+            url: "music/bgmusic2.mp3",
             badge: "🔥"
         },
         {
