@@ -246,7 +246,7 @@ function triggerBeatRing() {
 function setMood(category) {
     const m = moodConfig[category];
     if (!m) return;
-    document.body.classList.remove('mood-punjabi', 'mood-bollywood', 'mood-english');
+    document.body.classList.remove('mood-Bollywood', 'mood-Punjabi', 'mood-English');
     document.body.classList.add(m.cls);
     moodLabel.textContent  = m.label;
     currentMoodRgb = m.rgb;
