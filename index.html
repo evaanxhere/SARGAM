@@ -3,109 +3,133 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SARGAM — Cosmic Player</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <title>SARGAM — Your Cosmic Player</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <audio id="mainAudio" crossorigin="anonymous"></audio>
 
-    <!-- Starfield Canvas -->
-    <canvas id="starCanvas"></canvas>
+    <!-- Nebula background canvas -->
+    <canvas id="nebulaCanvas"></canvas>
 
-    <!-- Mood overlay -->
-    <div id="moodOverlay" class="mood-overlay"></div>
+    <!-- Page enters invisible, JS triggers the drift-in -->
+    <div id="appShell" class="app-shell">
 
-    <header class="hero-section">
-        <div class="hero-content">
+        <!-- ── HERO ── -->
+        <header class="hero">
 
-            <div class="brand fade-in">
-                <span class="brand-dot"></span>
-                <h1>SARGAM</h1>
-                <span class="brand-dot"></span>
+            <!-- Brand drifts in from top -->
+            <div class="brand drift-top" id="brand">
+                <span class="brand-line"></span>
+                <div class="brand-text">
+                    <span class="brand-sub">✦ private cosmic player ✦</span>
+                    <h1 class="brand-title">SARGAM</h1>
+                </div>
+                <span class="brand-line"></span>
             </div>
-            <p class="sub-text fade-in" id="moodLabel">🌌 Initialising Galaxy...</p>
 
-            <!-- Player Card -->
-            <div class="player-card fade-in">
+            <!-- Mood label drifts in from left -->
+            <div class="mood-pill drift-left" id="moodPill">
+                <span class="mood-dot" id="moodDot"></span>
+                <span id="moodLabel">Initialising...</span>
+            </div>
 
-                <!-- Visualizer -->
-                <div class="visualizer-wrapper">
-                    <canvas id="visualizerCanvas"></canvas>
-                    <div class="disc-wrapper">
-                        <div id="vinylDisk" class="vinyl-disc">
-                            <div class="vinyl-inner-ring"></div>
-                            <div class="vinyl-sticker" id="stickerEmoji">🎵</div>
-                        </div>
+            <!-- Player card drifts in from right -->
+            <div class="player-card drift-right float-idle" id="playerCard">
+
+                <!-- Glow ring reacts to beat -->
+                <div class="beat-ring" id="beatRing"></div>
+
+                <!-- Visualizer + Disc -->
+                <div class="disc-stage">
+                    <canvas id="vizCanvas"></canvas>
+                    <div class="vinyl" id="vinylDisk">
+                        <div class="vinyl-groove vinyl-groove-1"></div>
+                        <div class="vinyl-groove vinyl-groove-2"></div>
+                        <div class="vinyl-groove vinyl-groove-3"></div>
+                        <div class="vinyl-center" id="stickerEmoji">🎵</div>
                     </div>
                 </div>
 
-                <!-- Track Info -->
-                <div class="track-info">
-                    <div class="now-playing-title" id="playerTitle">No Song Playing</div>
-                    <div class="now-playing-artist" id="playerArtist">Select a song below</div>
+                <!-- Track info — animates on change -->
+                <div class="track-info-wrap">
+                    <div class="track-info" id="trackInfo">
+                        <div class="track-title" id="playerTitle">No Song Playing</div>
+                        <div class="track-artist" id="playerArtist">Select a track below</div>
+                    </div>
                 </div>
 
                 <!-- Timeline -->
-                <div class="timeline-container" id="timelineContainer">
-                    <div class="timeline-filled" id="timelineFilled"></div>
-                </div>
-                <div class="time-stamps">
-                    <span id="timeCurrent">0:00</span>
-                    <span id="timeTotal">0:00</span>
+                <div class="timeline-wrap">
+                    <div class="timeline" id="timelineContainer">
+                        <div class="timeline-fill" id="timelineFilled"></div>
+                        <div class="timeline-thumb" id="timelineThumb"></div>
+                    </div>
+                    <div class="timestamps">
+                        <span id="timeCurrent">0:00</span>
+                        <span id="timeTotal">0:00</span>
+                    </div>
                 </div>
 
                 <!-- Controls -->
-                <div class="playback-controls">
-                    <button class="control-btn" id="prevBtn" title="Previous">&#9664;&#9664;</button>
-                    <button class="control-btn play-toggle" id="playButton">&#9654;</button>
-                    <button class="control-btn" id="nextBtn" title="Next">&#9654;&#9654;</button>
+                <div class="controls">
+                    <button class="ctrl-btn" id="prevBtn">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg>
+                    </button>
+                    <button class="ctrl-btn ctrl-play" id="playButton">
+                        <svg id="playIcon" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                        <svg id="pauseIcon" viewBox="0 0 24 24" fill="currentColor" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                    </button>
+                    <button class="ctrl-btn" id="nextBtn">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zm2-8.14 5.17 2.14L8 14.14V9.86zM16 6h2v12h-2z"/></svg>
+                    </button>
                 </div>
 
-            </div>
-        </div>
-    </header>
+            </div><!-- /player-card -->
 
-    <!-- Mood badge -->
-    <div class="mood-banner" id="moodBanner">
-        <span id="moodBannerText">🌾 Punjabi Beats</span>
-    </div>
+        </header>
 
-    <main>
-        <section class="playlist-section">
-            <div class="section-header">
-                <span class="section-icon">🌾</span>
-                <h2>Bollywood</h2>
-                <span class="section-tag mood-punjabi-tag">GOLDEN</span>
-            </div>
-            <div id="playlist-Bollywood" class="playlist-grid"></div>
-        </section>
+        <!-- ── PLAYLIST SECTIONS ── -->
+        <main class="main drift-bottom" id="mainContent">
 
-        <section class="playlist-section">
-            <div class="section-header">
-                <span class="section-icon">🎬</span>
-                <h2>Punjabi</h2>
-                <span class="section-tag mood-bollywood-tag">CINEMA</span>
-            </div>
-            <div id="playlist-Punjabi" class="playlist-grid"></div>
-        </section>
+            <section class="pl-section">
+                <div class="pl-header">
+                    <span class="pl-icon">🎬</span>
+                    <h2 class="pl-title">Bollywood</h2>
+                    <span class="pl-chip chip-Bollywood">ਬਾਲੀਵੁੱਡ</span>
+                </div>
+                <div class="pl-grid" id="playlist-Bollywood"></div>
+            </section>
 
-        <section class="playlist-section">
-            <div class="section-header">
-                <span class="section-icon">🎧</span>
-                <h2>English</h2>
-                <span class="section-tag mood-english-tag">OCEAN</span>
-            </div>
-            <div id="playlist-English" class="playlist-grid"></div>
-        </section>
-    </main>
+            <section class="pl-section">
+                <div class="pl-header">
+                    <span class="pl-icon">🌾</span>
+                    <h2 class="pl-title">Punjabi</h2>
+                    <span class="pl-chip chip-Punjabi">ਪੰਜਾਬੀ</span>
+                </div>
+                <div class="pl-grid" id="playlist-Punjabi"></div>
+            </section>
 
-    <footer>
-        <div class="footer-glow"></div>
-        <p class="footer-brand">SARGAM</p>
-        <p class="footer-sub">Private Cosmic Player — Built by Evaan </p>
-    </footer>
+            <section class="pl-section">
+                <div class="pl-header">
+                    <span class="pl-icon">🎧</span>
+                    <h2 class="pl-title">English</h2>
+                    <span class="pl-chip chip-English">ਅੰਗਰੇਜ਼ੀ</span>
+                </div>
+                <div class="pl-grid" id="playlist-English"></div>
+            </section>
+
+        </main>
+
+        <footer class="footer drift-bottom">
+            <div class="footer-rule"></div>
+            <p class="footer-name">SARGAM</p>
+            <p class="footer-tagline">By Evaan</p>
+        </footer>
+
+    </div><!-- /appShell -->
 
     <script src="script.js"></script>
 </body>
