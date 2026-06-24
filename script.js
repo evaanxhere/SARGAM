@@ -488,6 +488,14 @@ document.addEventListener('DOMContentLoaded', () => {
     setupMagneticHover();
     setupEvents();
     triggerEntrance();
+    // Crazy tap feedback
+document.querySelectorAll('.song-item').forEach(item => {
+    item.addEventListener('click', () => {
+        item.style.transition = 'all 0.2s';
+        item.style.transform = 'scale(0.92)';
+        setTimeout(() => item.style.transform = '', 180);
+    });
+});
 
     // Load first track silently (no autoplay)
     loadTrack(0, false);
