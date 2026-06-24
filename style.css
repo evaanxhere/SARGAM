@@ -8,6 +8,10 @@
     --deep:  #07060f;
     --glass: rgba(255,255,255,0.035);
     --rim:   rgba(255,255,255,0.07);
+   /* Updated Premium Fonts */
+    --fd:    'Instrument Sans', system-ui, -apple-system, sans-serif;   /* Main futuristic/clean title font */
+    --fb:    'Instrument Sans', system-ui, -apple-system, sans-serif;   /* Body text - super smooth */
+   
 
     /* Active mood (JS overrides these) */
     --m0: #a78bfa;
@@ -120,9 +124,9 @@ body {
 }
 .brand-title {
     font-family: var(--fd);
-    font-size: clamp(1.8rem, 7vw, 2.8rem);
-    font-weight: 900;
-    letter-spacing: 0.24em;
+    font-size: clamp(1.9rem, 7.5vw, 3rem);
+    font-weight: 700;
+    letter-spacing: 0.08em;
     color: var(--txt);
     text-shadow:
         0 0 35px var(--m0),
@@ -307,8 +311,8 @@ body {
 .track-title {
     font-family: var(--fd);
     font-size: clamp(0.78rem, 2.5vw, 0.92rem);
-    font-weight: 700;
-    letter-spacing: 0.06em;
+    font-weight: 600;
+    letter-spacing: 0.02em;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
