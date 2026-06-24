@@ -3,30 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Suno Vibes - My Playlist</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <title>Suno Vibes — Cosmic Player</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <audio id="mainAudio"></audio>
+    <audio id="mainAudio" crossorigin="anonymous"></audio>
+
+    <!-- Starfield Canvas -->
+    <canvas id="starCanvas"></canvas>
+
+    <!-- Mood overlay -->
+    <div id="moodOverlay" class="mood-overlay"></div>
 
     <header class="hero-section">
         <div class="hero-content">
-            <h1 class="fade-in">Suno Vibes 🎧</h1>
-            <p class="fade-in sub-text">Select any song below to start playing!</p>
-            
+
+            <div class="brand fade-in">
+                <span class="brand-dot"></span>
+                <h1>SUNO VIBES</h1>
+                <span class="brand-dot"></span>
+            </div>
+            <p class="sub-text fade-in" id="moodLabel">🌌 Initialising Galaxy...</p>
+
+            <!-- Player Card -->
             <div class="player-card fade-in">
-                
-                <div class="disc-wrapper">
-                    <div id="vinylDisk" class="vinyl-disc">
-                        <div class="vinyl-sticker" id="stickerEmoji">🎵</div>
+
+                <!-- Visualizer -->
+                <div class="visualizer-wrapper">
+                    <canvas id="visualizerCanvas"></canvas>
+                    <div class="disc-wrapper">
+                        <div id="vinylDisk" class="vinyl-disc">
+                            <div class="vinyl-inner-ring"></div>
+                            <div class="vinyl-sticker" id="stickerEmoji">🎵</div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="now-playing-title" id="playerTitle">No Song Playing</div>
-                <div class="now-playing-artist" id="playerArtist">Select a song below</div>
+                <!-- Track Info -->
+                <div class="track-info">
+                    <div class="now-playing-title" id="playerTitle">No Song Playing</div>
+                    <div class="now-playing-artist" id="playerArtist">Select a song below</div>
+                </div>
 
+                <!-- Timeline -->
                 <div class="timeline-container" id="timelineContainer">
                     <div class="timeline-filled" id="timelineFilled"></div>
                 </div>
@@ -35,42 +56,55 @@
                     <span id="timeTotal">0:00</span>
                 </div>
 
+                <!-- Controls -->
                 <div class="playback-controls">
-                    <button class="control-btn" id="prevBtn"><</button>
-                    <button class="control-btn play-toggle" id="playButton">▶</button>
-                    <button class="control-btn" id="nextBtn">></button>
+                    <button class="control-btn" id="prevBtn" title="Previous">&#9664;&#9664;</button>
+                    <button class="control-btn play-toggle" id="playButton">&#9654;</button>
+                    <button class="control-btn" id="nextBtn" title="Next">&#9654;&#9654;</button>
                 </div>
 
             </div>
         </div>
     </header>
 
+    <!-- Mood badge -->
+    <div class="mood-banner" id="moodBanner">
+        <span id="moodBannerText">🌾 Punjabi Beats</span>
+    </div>
+
     <main>
-        <section class="story-section is-visible">
-            <div class="content-box">
-                <h2>Punjabi Beats 🌾</h2>
-                <div id="playlist-punjabi"></div>
+        <section class="playlist-section">
+            <div class="section-header">
+                <span class="section-icon">🌾</span>
+                <h2>Punjabi Beats</h2>
+                <span class="section-tag mood-punjabi-tag">GOLDEN</span>
             </div>
+            <div id="playlist-punjabi" class="playlist-grid"></div>
         </section>
 
-        <section class="story-section is-visible">
-            <div class="content-box">
-                <h2>Bollywood 90s 🎬</h2>
-                <div id="playlist-bollywood"></div>
+        <section class="playlist-section">
+            <div class="section-header">
+                <span class="section-icon">🎬</span>
+                <h2>Bollywood 90s</h2>
+                <span class="section-tag mood-bollywood-tag">CINEMA</span>
             </div>
+            <div id="playlist-bollywood" class="playlist-grid"></div>
         </section>
 
-        <section class="story-section is-visible">
-            <div class="content-box">
-                <h2>Old Punjabi / English 🎧</h2>
-                <div id="playlist-english"></div>
+        <section class="playlist-section">
+            <div class="section-header">
+                <span class="section-icon">🎧</span>
+                <h2>Old Punjabi / English</h2>
+                <span class="section-tag mood-english-tag">OCEAN</span>
             </div>
+            <div id="playlist-english" class="playlist-grid"></div>
         </section>
     </main>
 
     <footer>
-        <p>Private Custom Player Dashboard</p>
-        <p style="font-size: 0.75rem; margin-top: 5px;">Created with Retro Aesthetic Theme</p>
+        <div class="footer-glow"></div>
+        <p class="footer-brand">SUNO VIBES</p>
+        <p class="footer-sub">Private Cosmic Player — Built with ✨</p>
     </footer>
 
     <script src="script.js"></script>
