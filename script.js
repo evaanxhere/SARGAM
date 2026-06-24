@@ -4,34 +4,33 @@ const playlistData = {
         {
             title: "Oreo's Jam Track",
             artist: "Vibe Mix",
-            // Your exact main GitHub audio file path
-            url: "music/bgmusic.mp3",
+            url: "music/bgmusic.mp3",       // ✅ Your uploaded MP3
             badge: "🌾"
         },
         {
-            title: "Dil Nu lofi beats",
+            title: "Dil Nu Lofi Beats",
             artist: "Aesthetic Instrumental",
-            url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+            url: "music/dil-nu-lofi.mp3",   // 🎵 Add this file to music/ folder
             badge: "🔥"
         },
         {
             title: "Late Night Geri",
             artist: "Punjabi Lo-fi Loop",
-            url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+            url: "music/late-night-geri.mp3", // 🎵 Add this file to music/ folder
             badge: "🚗"
         }
     ],
     bollywood: [
         {
-            title: "Chura Ke Dil Mera lofi",
+            title: "Chura Ke Dil Mera Lofi",
             artist: "Nostalgia Instrumental Reverb",
-            url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
+            url: "music/chura-ke-dil.mp3",  // 🎵 Add this file to music/ folder
             badge: "🥀"
         },
         {
             title: "Tum Mile Chill Mix",
             artist: "Rainy Afternoon Lofi",
-            url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3",
+            url: "music/tum-mile-chill.mp3", // 🎵 Add this file to music/ folder
             badge: "☔"
         }
     ],
@@ -39,18 +38,17 @@ const playlistData = {
         {
             title: "Late Night Coffee",
             artist: "English Lo-fi Beats",
-            url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3",
+            url: "music/late-night-coffee.mp3", // 🎵 Add this file to music/ folder
             badge: "☕"
         },
         {
             title: "Sunset Boulevard Drive",
             artist: "Chill Dreamy Indie Synth",
-            url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3",
+            url: "music/sunset-boulevard.mp3",  // 🎵 Add this file to music/ folder
             badge: "🌅"
         }
     ]
 };
-
 // Flatten data for seamless Next/Prev global playback skipping
 const globalPlaylist = [];
 const categoryKeys = Object.keys(playlistData);
