@@ -2,15 +2,15 @@
 const playlistData = {
     punjabi: [
         {
-            title: "Oreo's Jam Track",
+            title: "Pashmina",
             artist: "Vibe Mix",
             url: "music/bgmusic.mp3",       // ✅ Your uploaded MP3
             badge: "🌾"
         },
         {
-            title: "Dil Nu Lofi Beats",
+            title: "Saat Samundar",
             artist: "Aesthetic Instrumental",
-            url: "music/dil-nu-lofi.mp3",   // 🎵 Add this file to music/ folder
+            url: "music/bgmusic2.mp3",   // 🎵 Add this file to music/ folder
             badge: "🔥"
         },
         {
