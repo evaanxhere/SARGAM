@@ -8,17 +8,17 @@
 // UPDATE your song urls here. Keep music/ prefix for local files.
 const playlistData = {
     Bollywood: [
-        { title: "Fitoor",   artist: "Arijit Singh",                    url: "music/bgmusic.mp3",                                              badge: "🌾" },
-        { title: "Saat samundar",  artist: "Sadhana Sargam",       url: "music/bgmusic2.mp3",    },
-        { title: "Tum ho",    artist: "Mohit Chauhan",           url: "music/bgmusic3.mp3",    }
+        { title: "Fitoor",   artist: "Arijit Singh",                    url: "music/bgmusic.mp3",badge: "💫" },
+        { title: "Saat samundar",  artist: "Sadhana Sargam",       url: "music/bgmusic2.mp3", badge: "🌊"   },
+        { title: "Tum ho",    artist: "Mohit Chauhan",           url: "music/bgmusic3.mp3",  badge: "💞"  }
     ],
     Punjabi: [
-        { title: "Channa", artist: "Gippy Grewal", url: "music/bgmusic4.mp3",   },
-        { title: "Maar sutiya",artist: "Amrinder Gill",  url: "music/bgmusic5.mp3",  }
+        { title: "Channa", artist: "Gippy Grewal", url: "music/bgmusic4.mp3", badge: "🌙"  },
+        { title: "Maar sutiya",artist: "Amrinder Gill",  url: "music/bgmusic5.mp3", badge: "🕺🏻" }
     ],
     English: [
-        { title: "Espresso",     artist: "Sabrina Carpenter",       url: "music/bgmusic6.mp3",   },
-        { title: "Blinding Lights",artist: "The Weeknd",  url: "music/bgmusic7.mp3",    }
+        { title: "Espresso",     artist: "Sabrina Carpenter",       url: "music/bgmusic6.mp3", badge: "☕"  },
+        { title: "Blinding Lights",artist: "The Weeknd",  url: "music/bgmusic7.mp3",   badge: "💡" }
     ]
 };
 
