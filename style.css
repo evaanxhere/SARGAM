@@ -414,7 +414,7 @@ body {
     border: 1px solid rgba(255,255,255,0.045);
     border-radius: 22px;
     padding: 22px 18px;
-    backdrop-filter: blur(14px);
+    backdrop-filter: blur(20px);
     transition: box-shadow 0.4s ease;
 }
 .pl-section:hover {
