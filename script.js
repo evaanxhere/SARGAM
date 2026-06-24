@@ -6,7 +6,7 @@
 const playlistData = {
     Bollywood: [
         {
-            title: "Pashmina",
+            title: "Fitoor",
             artist: "Arijit Singh",
             url: "music/bgmusic.mp3",
             badge: "🌾"
