@@ -4,51 +4,51 @@
 
 // --- 1. PLAYLIST DATA (update urls with your music/ paths) ---
 const playlistData = {
-    punjabi: [
+    Bollywood: [
         {
-            title: "Oreo's Jam Track",
-            artist: "Vibe Mix",
+            title: "Pashmina",
+            artist: "Arijit Singh",
             url: "music/bgmusic.mp3",
             badge: "🌾"
         },
         {
-            title: "Dil Nu Lofi Beats",
-            artist: "Aesthetic Instrumental",
+            title: "Saat samundar",
+            artist: "Sadhana Sargam",
             url: "music/bgmusic2.mp3",
             badge: "🔥"
         },
         {
-            title: "Late Night Geri",
-            artist: "Punjabi Lo-fi Loop",
-            url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+            title: "Tum ho",
+            artist: "Mohit Chauhan",
+            url: "music/bgmusic3.mp3",
             badge: "🚗"
         }
     ],
-    bollywood: [
+    Punjabi: [
         {
-            title: "Chura Ke Dil Mera Lofi",
-            artist: "Nostalgia Instrumental Reverb",
-            url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
+            title: "Channa",
+            artist: "Gippy Grewal",
+            url: "music/bgmusic4.mp3",
             badge: "🥀"
         },
         {
-            title: "Tum Mile Chill Mix",
-            artist: "Rainy Afternoon Lofi",
-            url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3",
+            title: "Maar Sutiya",
+            artist: "Amrinder Gill",
+            url: "music/bgmusic5.mp3",
             badge: "☔"
         }
     ],
-    english: [
+    English: [
         {
-            title: "Late Night Coffee",
-            artist: "English Lo-fi Beats",
-            url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3",
+            title: "Espresso",
+            artist: "Sabrina Carpenter",
+            url: "music/bgmusic6.mp3",
             badge: "☕"
         },
         {
-            title: "Sunset Boulevard Drive",
-            artist: "Chill Dreamy Indie Synth",
-            url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3",
+            title: "Blinding Lighs",
+            artist: "The Weeknd",
+            url: "music/bgmusic7.mp3",
             badge: "🌅"
         }
     ]
