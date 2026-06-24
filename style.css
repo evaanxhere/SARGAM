@@ -20,9 +20,9 @@
     --ms: rgba(167,139,250,0.15);
 
     /* Mood palettes */
-    --Bollywood-0: #f59e0b; --Bollywood-1: #b45309; --Bollywood-g: rgba(245,158,11,0.4); --punjabi-s: rgba(245,158,11,0.12);
-    --Punjabi-0:#f43f5e; --Punjabi-1:#9f1239; --Punjabi-g:rgba(244,63,94,0.4);  --bollywood-s:rgba(244,63,94,0.12);
-    --English-0: #22d3ee; --English-1: #0e7490; --English-g: rgba(34,211,238,0.4);  --english-s: rgba(34,211,238,0.12);
+    --Bollywood-0: #f59e0b; --Bollywood-1: #b45309; --Bollywood-g: rgba(245,158,11,0.4); --Bollywood-s: rgba(245,158,11,0.12);
+    --Punjabi-0:#f43f5e; --Punjabi-1:#9f1239; --Punjabi-g:rgba(244,63,94,0.4);  --Punjabj-s:rgba(244,63,94,0.12);
+    --English-0: #22d3ee; --English-1: #0e7490; --English-g: rgba(34,211,238,0.4);  --English-s: rgba(34,211,238,0.12);
 
     --txt:  #eeeeff;
     --dim:  rgba(238,238,255,0.45);
@@ -447,9 +447,9 @@ body {
     border-radius: 99px;
     font-weight: 700;
 }
-.chip-punjabi   { background: var(--punjabi-s);   color: var(--punjabi-0);   border: 1px solid rgba(245,158,11,0.25); }
-.chip-bollywood { background: var(--bollywood-s); color: var(--bollywood-0); border: 1px solid rgba(244,63,94,0.25);  }
-.chip-english   { background: var(--english-s);   color: var(--english-0);   border: 1px solid rgba(34,211,238,0.25); }
+.chip-Bollywood   { background: var(--Bollywood-s);   color: var(--Bollywood-0);   border: 1px solid rgba(245,158,11,0.25); }
+.chip-Punjabi { background: var(--Punjabi-s); color: var(--Punjabi-0); border: 1px solid rgba(244,63,94,0.25);  }
+.chip-English   { background: var(--English-s);   color: var(--English-0);   border: 1px solid rgba(34,211,238,0.25); }
 
 /* ── SONG ROWS ── */
 .pl-grid { display: flex; flex-direction: column; gap: 4px; }
@@ -532,9 +532,9 @@ body {
 /* ══════════════════════════════
    MOOD BODY CLASSES
    ══════════════════════════════ */
-body.mood-punjabi   { --m0: var(--punjabi-0);   --m1: var(--punjabi-1);   --mg: var(--punjabi-g);   --ms: var(--punjabi-s);   }
-body.mood-bollywood { --m0: var(--bollywood-0); --m1: var(--bollywood-1); --mg: var(--bollywood-g); --ms: var(--bollywood-s); }
-body.mood-english   { --m0: var(--english-0);   --m1: var(--english-1);   --mg: var(--english-g);   --ms: var(--english-s);   }
+body.mood-Bollywood   { --m0: var(--Bollywood-0);   --m1: var(--Bollywood-1);   --mg: var(--Bollywood-g);   --ms: var(--Bollywood-s);   }
+body.mood-Punjabi { --m0: var(--Punjabi-0); --m1: var(--Punjabi-1); --mg: var(--Punjabi-g); --ms: var(--Punjabi-s); }
+body.mood-English   { --m0: var(--English-0);   --m1: var(--English-1);   --mg: var(--English-g);   --ms: var(--English-s);   }
 
 /* ── RESPONSIVE ── */
 @media (max-width: 420px) {
