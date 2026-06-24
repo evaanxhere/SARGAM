@@ -182,9 +182,6 @@ body {
         0 0 80px var(--mg),
         inset 0 1.5px 0 rgba(255,255,255,0.12);
     transition: box-shadow 1.4s ease;
-
-.player-card:hover {
-    transform: scale(1.03);
 }
 
 /* Shimmer top edge */
@@ -228,8 +225,8 @@ body {
 /* ── DISC STAGE ── */
 .disc-stage {
     position: relative;
-    width: 210px; height: 210px;
-    margin: 0 auto 28px;
+    width: 170px; height: 170px;
+    margin: 0 auto 22px;
 }
 #vizCanvas {
     position: absolute;
@@ -241,7 +238,7 @@ body {
     position: absolute;
     top: 50%; left: 50%;
     transform: translate(-50%, -50%);
-    width: 138px; height: 138px;
+    width: 108px; height: 108px;
     border-radius: 50%;
     background:
         radial-gradient(circle at 40% 35%,
@@ -458,14 +455,6 @@ body {
 .pl-grid { display: flex; flex-direction: column; gap: 4px; }
 
 .song-item {
-   .song-item {
-    padding: 14px 18px;
-    border-radius: 16px;
-}
-.song-item:active {
-    transform: scale(0.97);
-    background: var(--ms);
-}
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -562,4 +551,4 @@ body.mood-english   { --m0: var(--english-0);   --m1: var(--english-1);   --mg: 
         opacity: 1; transform: none;
     }
     #nebulaCanvas { display: none; }
-                 }
+}
