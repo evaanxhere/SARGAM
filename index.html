@@ -43,35 +43,44 @@
                 <div class="beat-ring" id="beatRing"></div>
 
                 <!-- Visualizer + Disc -->
-                <div class="disc-stage">
-                    <canvas id="vizCanvas"></canvas>
-                    <div class="vinyl" id="vinylDisk">
-                        <div class="vinyl-groove vinyl-groove-1"></div>
-                        <div class="vinyl-groove vinyl-groove-2"></div>
-                        <div class="vinyl-groove vinyl-groove-3"></div>
-                        <div class="vinyl-center" id="stickerEmoji">🎵</div>
-                    </div>
-                </div>
+                <div class="player-card">
+    <div class="disc-stage">
+        <canvas id="vizCanvas" width="190" height="190"></canvas>
+        <div class="vinyl" id="vinylDisk">
+            <div class="vinyl-groove vinyl-groove-1"></div>
+            <div class="vinyl-groove vinyl-groove-2"></div>
+            <div class="vinyl-groove vinyl-groove-3"></div>
+            <div class="vinyl-center" id="stickerEmoji">🎵</div>
+        </div>
+    </div>
+    
+    <div class="track-info-wrap">
+        <div class="track-info" id="trackInfo">
+            <div class="track-title" id="playerTitle">No Song Playing</div>
+            <div class="track-artist" id="playerArtist">Select a track below</div>
+        </div>
+    </div>
 
-                <!-- Track info — animates on change -->
-                <div class="track-info-wrap">
-                    <div class="track-info" id="trackInfo">
-                        <div class="track-title" id="playerTitle">No Song Playing</div>
-                        <div class="track-artist" id="playerArtist">Select a track below</div>
-                    </div>
-                </div>
+    <div class="timeline-wrap">
+        <div class="timeline" id="timelineContainer">
+            <div class="timeline-fill" id="timelineFilled"></div>
+            <div class="timeline-thumb" id="timelineThumb"></div>
+        </div>
+        <div class="timestamps">
+            <span id="timeCurrent">0:00</span>
+            <span id="timeTotal">0:00</span>
+        </div>
+    </div>
 
-                <!-- Timeline -->
-                <div class="timeline-wrap">
-                    <div class="timeline" id="timelineContainer">
-                        <div class="timeline-fill" id="timelineFilled"></div>
-                        <div class="timeline-thumb" id="timelineThumb"></div>
-                    </div>
-                    <div class="timestamps">
-                        <span id="timeCurrent">0:00</span>
-                        <span id="timeTotal">0:00</span>
-                    </div>
-                </div>
+    <div class="controls">
+        <button class="ctrl-btn" id="prevBtn">⫻</button>
+        <button class="ctrl-play" id="playButton">
+            <span id="playIcon">▶</span>
+            <span id="pauseIcon" style="display:none">⏸</span>
+        </button>
+        <button class="ctrl-btn" id="nextBtn">⫻</button>
+    </div>
+            
 
                 <!-- Controls -->
                 <div class="controls">
