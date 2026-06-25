@@ -437,20 +437,39 @@ body {
     border-radius: 16px;
     cursor: pointer;
     border: 1px solid transparent;
-    transition: all 0.28s cubic-bezier(0.23, 1, 0.32, 1);
-    will-change: transform;
+    will-change: transform, opacity;
+    
+    /* Start hidden and pushed down for the entrance animation */
+    opacity: 0;
+    transform: translateY(30px);
+    
+    /* Smooth transition for the reveal AND the hover state */
+    transition: opacity 0.6s ease, 
+                transform 0.6s var(--ease-out-expo), 
+                background 0.28s ease, 
+                box-shadow 0.28s ease, 
+                border-color 0.28s ease;
 }
-.song-item:hover {
+
+/* The class our JS will add when you scroll to the song */
+.song-item.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.song-item.visible:hover {
     background: rgba(255,255,255,0.055);
     border-color: rgba(255,255,255,0.1);
-    transform: translateX(8px) scale(1.012);
+    transform: translateX(8px) scale(1.012); /* Interactive magnetic pull */
     box-shadow: 0 0 28px var(--ms);
 }
-.song-item.active {
+
+.song-item.visible.active {
     background: var(--ms);
     border-color: var(--m0);
     box-shadow: 0 0 22px var(--ms);
 }
+
 
 .song-left {
     display: flex;
