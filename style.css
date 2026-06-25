@@ -9,9 +9,9 @@
     --glass: rgba(255,255,255,0.035);
     --rim:   rgba(255,255,255,0.07);
    /* Updated Premium Fonts */
-    --fd:    'Instrument Sans', system-ui, -apple-system, sans-serif;   /* Main futuristic/clean title font */
-    --fb:    'Instrument Sans', system-ui, -apple-system, sans-serif;   /* Body text - super smooth */
-   
+      --fs-brand: 'Instrument Serif', serif; /* The premium serif */
+    --fs-ui: 'Instrument Sans', system-ui, sans-serif; /* The clean sans */
+}
 
     /* Active mood (JS overrides these) */
     --m0: #a78bfa;
