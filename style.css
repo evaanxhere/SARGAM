@@ -123,15 +123,16 @@ body {
     font-weight: 300;
 }
 .brand-title {
-    font-family: var(--fd);
-    font-size: clamp(1.9rem, 7.5vw, 3rem);
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    color: var(--txt);
-    text-shadow:
-        0 0 35px var(--m0),
-        0 0 80px var(--mg),
-        0 0 140px var(--ms);
+    font-family: var(--fs-brand);
+    font-style: italic;
+    font-size: clamp(3rem, 10vw, 4.5rem);
+    font-weight: 400;
+    color: #ffffff;
+    letter-spacing: 0.02em;
+    text-shadow: 0 10px 40px var(--mg);
+    background: linear-gradient(180deg, #ffffff 0%, rgba(255,255,255,0.6) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
     transition: text-shadow 1.4s ease;
 }
 
