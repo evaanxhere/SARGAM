@@ -381,7 +381,8 @@ function fmt(s) {
 }
 
 // ══════════════════════════════════════════════
-//   RENDER PLAYLISTS
+// ══════════════════════════════════════════════
+//   RENDER PLAYLISTS & SCROLL REVEAL
 // ══════════════════════════════════════════════
 function renderPlaylists() {
     catKeys.forEach(cat => {
@@ -393,6 +394,10 @@ function renderPlaylists() {
             const row  = document.createElement('div');
             row.className = `song-item cat-${cat} idx-${i}`;
             row.onclick   = () => loadTrack(gIdx, true);
+            
+            // Add a slight delay based on the index so they cascade in nicely
+            row.style.transitionDelay = `${i * 0.08}s, ${i * 0.08}s, 0s, 0s, 0s`;
+
             row.innerHTML = `
                 <div class="song-left">
                     <span class="song-badge">${song.badge}</span>
@@ -403,7 +408,23 @@ function renderPlaylists() {
             container.appendChild(row);
         });
     });
+
+    // Premium Interactive Scroll Reveal
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                observer.unobserve(entry.target); // Only animate once
+            }
+        });
+    }, { 
+        threshold: 0.1, // Trigger when 10% of the item is visible
+        rootMargin: "0px 0px -20px 0px" // Trigger slightly before it hits the bottom
+    });
+
+    document.querySelectorAll('.song-item').forEach(el => observer.observe(el));
 }
+
 
 // ══════════════════════════════════════════════
 //   MAGNETIC HOVER (song rows lean toward cursor)
