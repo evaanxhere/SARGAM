@@ -51,6 +51,39 @@ const nebCtx     = nebCanvas.getContext('2d');
 const moodWash   = document.getElementById('moodWash');
 const playerCard = document.getElementById('playerCard');
 const progressBar = document.getElementById('progressBar');
+// ══════════════════════════════════════════════
+//   DYNAMIC COLOR ENGINE (Chameleon Theme)
+// ══════════════════════════════════════════════
+const colorThief = new ColorThief();
+
+function applyDynamicColor(imageUrl) {
+    if (!imageUrl) return; // If there is no image, skip it!
+
+    // 1. Create a hidden, temporary image tag in the background
+    const img = new Image();
+    
+    // 2. This prevents Apple's security from blocking our color scan
+    img.crossOrigin = 'Anonymous'; 
+    img.src = imageUrl;
+
+    // 3. Wait for the image to fully load, then steal the color!
+    img.addEventListener('load', function() {
+        // colorThief gives us an array of numbers like [255, 0, 150]
+        const rgb = colorThief.getColor(img);
+        
+        // Format it so CSS can understand it: "255,0,150"
+        const rgbString = `${rgb[0]},${rgb[1]},${rgb[2]}`;
+
+        // 4. Update the global variable for your 3D sphere!
+        currentMoodRgb = rgbString;
+
+        // 5. Update the CSS variables so your glowing bar and shadows change!
+        document.documentElement.style.setProperty('--mrgb', rgbString);
+
+        // 6. Flash the background mood wash with the new color!
+        triggerMoodWash(`rgba(${rgbString}, 0.18)`);
+    });
+}
 
 // ══════════════════════════════════════════════
 //   APPLE MUSIC LIVE API FETCHER
@@ -291,7 +324,8 @@ function loadTrack(idx, autoplay=true) {
     
     audio.src = track.url;
     setMood(track.category);
-    animateTrackChange(track, dir);
+   applyDynamicColor(track.image);
+      animateTrackChange(track, dir);
     stickerEl.textContent = '◈';
     
     timeTot.textContent = fmt(track.duration);
