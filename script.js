@@ -247,7 +247,22 @@ function loadTrack(idx, autoplay=true) {
     progressBar.value = 0;
     progressBar.style.setProperty('--progress', '0%');
     
+  // NEW: Update OS Lock Screen and save memory
+    updateMediaSession(track);
+    saveState();
+    
     updateHighlight(); 
+    
+    if (autoplay) {
+        initAudio();
+        if (audioCtx.state==='suspended') audioCtx.resume();
+        audio.play().then(() => { 
+            isPlaying=true; 
+            setPlayVisuals(true); 
+            updateHighlight(); 
+        }).catch(e => console.log('Playback:',e));
+    }
+}
     
     if (autoplay) {
         initAudio();
@@ -336,6 +351,7 @@ function renderPlaylists() {
 function toggleShuffle() {
     isShuffle=!isShuffle;
     shuffleBtn.classList.toggle('active',isShuffle);
+    saveState(); // <-- Added this
 }
 function toggleRepeat() {
     repeatMode=(repeatMode+1)%3;
@@ -344,6 +360,7 @@ function toggleRepeat() {
     repeatBtn.innerHTML = repeatMode===2
         ? `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 7h10v3l4-4-4-4v3H5v6h2zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2zm-4-2V9h-1l-2 1v1h1.5v4z"/></svg>`
         : `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 7h10v3l4-4-4-4v3H5v6h2zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2z"/></svg>`;
+      saveState(); // <-- Added this
 }
 
 // ══════════════════════════════════════════════
@@ -432,46 +449,108 @@ audio.addEventListener('ended', () => {
         playNext();
     }
 });
+
+// ══════════════════════════════════════════════
+//   LOCAL STORAGE (Memory)
+// ══════════════════════════════════════════════
+function saveState() {
+    const state = {
+        currentIdx: currentIdx,
+        isShuffle: isShuffle,
+        repeatMode: repeatMode
+    };
+    localStorage.setItem('sargamState', JSON.stringify(state));
+}
+
+function loadState() {
+    const saved = localStorage.getItem('sargamState');
+    if (saved) {
+        const state = JSON.parse(saved);
+        currentIdx = state.currentIdx || 0;
+        
+        // Restore Shuffle UI
+        isShuffle = state.isShuffle || false;
+        shuffleBtn.classList.toggle('active', isShuffle);
+        
+        // Restore Repeat UI
+        repeatMode = state.repeatMode || 0;
+        repeatBtn.classList.toggle('active', repeatMode > 0);
+        repeatBtn.title = ['Repeat off','Repeat all','Repeat one'][repeatMode];
+        repeatBtn.innerHTML = repeatMode === 2
+            ? `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 7h10v3l4-4-4-4v3H5v6h2zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2zm-4-2V9h-1l-2 1v1h1.5v4z"/></svg>`
+            : `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 7h10v3l4-4-4-4v3H5v6h2zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2z"/></svg>`;
+    }
+}
+
+// ══════════════════════════════════════════════
+//   MEDIA SESSION API (Lock Screen & Hardware Buttons)
+// ══════════════════════════════════════════════
+function setupMediaSession() {
+    if ('mediaSession' in navigator) {
+        navigator.mediaSession.setActionHandler('play', togglePlay);
+        navigator.mediaSession.setActionHandler('pause', togglePlay);
+        navigator.mediaSession.setActionHandler('previoustrack', playPrev);
+        navigator.mediaSession.setActionHandler('nexttrack', playNext);
+    }
+}
+
+function updateMediaSession(track) {
+    if ('mediaSession' in navigator) {
+        navigator.mediaSession.metadata = new MediaMetadata({
+            title: track.title,
+            artist: track.artist,
+            album: `SARGAM - ${track.category}`,
+            // I added a premium abstract placeholder image for your lock screen!
+            artwork: [
+                { src: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=512&auto=format&fit=crop', sizes: '512x512', type: 'image/jpeg' }
+            ]
+        });
+    }
+}
+
 // ══════════════════════
 // ══════════════════════════════════════════════
 //   APP INITIALIZATION
 // ══════════════════════════════════════════════
 function initApp() {
-    // 1. Render the playlist UI
+    // 1. Load saved memory (Shuffle, Repeat, Current Track)
+    loadState();
+    
+    // 2. Render the playlist UI
     renderPlaylists();
 
-    // 2. Start the canvas backgrounds and visualizers
+    // 3. Start the canvas backgrounds and visualizers
     resizeNebula();
     drawNebula();
     drawViz();
 
-    // 3. Enable interactions
+    // 4. Enable interactions & Hardware Buttons
     setupKeyboard();
     setupSwipe();
     setupMagneticHover();
+    setupMediaSession(); // <-- Connects hardware keys!
 
-    // 4. Attach event listeners to your player buttons
+    // 5. Attach event listeners
     playBtn.addEventListener('click', togglePlay);
     prevBtn.addEventListener('click', playPrev);
     nextBtn.addEventListener('click', playNext);
     shuffleBtn.addEventListener('click', toggleShuffle);
     repeatBtn.addEventListener('click', toggleRepeat);
-    
-    // Ensure the canvas resizes if the user changes the window size
     window.addEventListener('resize', resizeNebula);
 
-    // 5. Load the first track into the player (without autoplaying)
+    // 6. Load the track from memory (but don't autoplay yet)
     if (globalPlaylist.length > 0) {
-        loadTrack(0, false);
+        loadTrack(currentIdx, false); // Uses currentIdx from local storage!
     }
 
-    // 6. Trigger the CSS entrance animations (This fixes the blank screen!)
+    // 7. Trigger the CSS entrance animations
     setTimeout(() => {
         document.querySelectorAll('.drift-top, .drift-left, .drift-right, .drift-bottom').forEach(el => {
             el.classList.add('arrived');
         });
     }, 100);
 }
+
 
 // Run the initialization when the HTML is fully loaded
 document.addEventListener('DOMContentLoaded', initApp);
