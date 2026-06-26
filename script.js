@@ -51,14 +51,13 @@ const nebCtx     = nebCanvas.getContext('2d');
 const moodWash   = document.getElementById('moodWash');
 const playerCard = document.getElementById('playerCard');
 const progressBar = document.getElementById('progressBar');
-
 // ══════════════════════════════════════════════
-//   JIOSAAVN LIVE API FETCHER
+//   APPLE MUSIC LIVE API FETCHER (100% Reliable)
 // ══════════════════════════════════════════════
 async function loadLiveMusic() {
-    moodLabel.textContent = "Connecting to JioSaavn...";
+    moodLabel.textContent = "Connecting to Apple Music...";
 
-    // You can change these search terms to whatever artists you want!
+    // Feel free to change these to any artists in the world!
     const queries = {
         Bollywood: "Arijit Singh",
         Punjabi: "Diljit Dosanjh",
@@ -69,39 +68,50 @@ async function loadLiveMusic() {
 
     for (const cat of Object.keys(queries)) {
         try {
-            // Fetching from the open-source JioSaavn wrapper
-            const res = await fetch(`https://saavn.dev/api/search/songs?query=${queries[cat]}&limit=5`);
+            // Fetching from Apple's official, lightning-fast public API
+            const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(queries[cat])}&entity=song&limit=5`);
             const json = await res.json();
             
-            if (json && json.success && json.data && json.data.results) {
-                playlistData[cat] = json.data.results.map((song) => {
+            if (json && json.results && json.results.length > 0) {
+                playlistData[cat] = json.results.map((song) => {
                     
-                    // Grab the highest quality audio URL
-                    const audioUrl = song.downloadUrl?.find(d => d.quality === '320kbps')?.url || song.downloadUrl?.[0]?.url || '';
-                    
-                    // Grab the highest resolution album art
-                    const imgUrl = song.image?.find(img => img.quality === '500x500')?.url || song.image?.[0]?.url || '';
-                    
-                    // Clean up weird HTML text formatting
-                    const cleanTitle = song.name.replace(/&quot;/g, '"').replace(/&amp;/g, '&');
-                    const artistName = song.primaryArtists || 'Unknown Artist';
+                    // Apple gives 100x100 images by default. We do a quick string replace to demand crisp 500x500 covers!
+                    const highResImage = song.artworkUrl100 ? song.artworkUrl100.replace('100x100bb', '500x500bb') : '';
 
                     return {
-                        title: cleanTitle,
-                        artist: artistName,
-                        url: audioUrl,
-                        image: imgUrl,
-                        duration: song.duration || 0, // Got the exact duration from the API!
+                        title: song.trackName || 'Unknown Title',
+                        artist: song.artistName || 'Unknown Artist',
+                        url: song.previewUrl, // 30-second ultra-high quality preview
+                        image: highResImage,
+                        duration: 30, // Previews are exactly 30 seconds
                         category: cat
                     };
-                }).filter(t => t.url); // Remove broken tracks
+                }).filter(t => t.url); // Remove any broken tracks without audio
                 
-                successCount++;
+                if (playlistData[cat].length > 0) {
+                    successCount++;
+                }
             }
         } catch (e) {
             console.log(`Failed to fetch ${cat}:`, e);
         }
     }
+
+    if (successCount === 0) {
+        alert("Network Error. Check your connection.");
+        return;
+    }
+
+    // Rebuild the global playlist dynamically
+    globalPlaylist = [];
+    Object.keys(playlistData).forEach(cat => {
+        playlistData[cat].forEach((track, i) => {
+            track.localIndex = i; 
+            globalPlaylist.push(track);
+        });
+    });
+}
+
 
     // Fallback just in case the API goes down
     if (successCount === 0) {
