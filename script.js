@@ -507,3 +507,45 @@ function setupKeyboard() {
 }
 
 // ══════════════════════
+// ══════════════════════════════════════════════
+//   APP INITIALIZATION
+// ══════════════════════════════════════════════
+function initApp() {
+    // 1. Render the playlist UI
+    renderPlaylists();
+
+    // 2. Start the canvas backgrounds and visualizers
+    resizeNebula();
+    drawNebula();
+    drawViz();
+
+    // 3. Enable interactions
+    setupKeyboard();
+    setupSwipe();
+    setupMagneticHover();
+
+    // 4. Attach event listeners to your player buttons
+    playBtn.addEventListener('click', togglePlay);
+    prevBtn.addEventListener('click', playPrev);
+    nextBtn.addEventListener('click', playNext);
+    shuffleBtn.addEventListener('click', toggleShuffle);
+    repeatBtn.addEventListener('click', toggleRepeat);
+    
+    // Ensure the canvas resizes if the user changes the window size
+    window.addEventListener('resize', resizeNebula);
+
+    // 5. Load the first track into the player (without autoplaying)
+    if (globalPlaylist.length > 0) {
+        loadTrack(0, false);
+    }
+
+    // 6. Trigger the CSS entrance animations (This fixes the blank screen!)
+    setTimeout(() => {
+        document.querySelectorAll('.drift-top, .drift-left, .drift-right, .drift-bottom').forEach(el => {
+            el.classList.add('arrived');
+        });
+    }, 100);
+}
+
+// Run the initialization when the HTML is fully loaded
+document.addEventListener('DOMContentLoaded', initApp);
