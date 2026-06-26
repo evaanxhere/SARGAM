@@ -298,13 +298,7 @@ function updateHighlight() {
     document.querySelector(`.song-item[data-cat="${t.category}"][data-idx="${t.localIndex}"]`)?.classList.add('active');
 }
 
-function autoScrollToActive() {
-    const t=globalPlaylist[currentIdx];
-    setTimeout(()=>{
-        document.querySelector(`.song-item[data-cat="${t.category}"][data-idx="${t.localIndex}"]`)
-            ?.scrollIntoView({ behavior:'smooth', block:'nearest' });
-    },300);
-}
+
 
 // ══════════════════════════════════════════════
 //   RENDER PLAYLISTS
