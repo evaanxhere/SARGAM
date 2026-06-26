@@ -12,11 +12,11 @@
 <body>
 
     <audio id="mainAudio" crossorigin="anonymous"></audio>
+    <div id="moodWash" class="mood-wash"></div>
     <canvas id="nebulaCanvas"></canvas>
 
     <div id="appShell" class="app-shell">
 
-        <!-- ── HERO ── -->
         <header class="hero">
 
             <div class="brand drift-top" id="brand">
@@ -51,11 +51,8 @@
                     </div>
                 </div>
 
-                <div class="timeline-wrap">
-                    <div class="timeline" id="timelineContainer">
-                        <div class="timeline-fill" id="timelineFilled"></div>
-                        <div class="timeline-thumb" id="timelineThumb"></div>
-                    </div>
+                <div class="waveform-wrap">
+                    <canvas id="waveCanvas" class="wave-canvas"></canvas>
                     <div class="timestamps">
                         <span id="timeCurrent">0:00</span>
                         <span id="timeTotal">0:00</span>
@@ -63,6 +60,9 @@
                 </div>
 
                 <div class="controls">
+                    <button class="ctrl-btn ctrl-small" id="shuffleBtn" aria-label="Shuffle" title="Shuffle">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17zm4.76-.82l3.65 3.65-3.65 3.65V14h-1.76c-.91 0-1.75-.36-2.37-.95L9.65 11.5l1.41-1.41 1.43 1.43c.32.32.76.48 1.21.48H15.35zm0 8.33V15h-1.76c-1.52 0-2.94-.59-4.01-1.67l-3.94-3.95-1.42 1.42 3.95 3.95C9.22 16.21 11.13 17 13.17 17H15.35v1.68l4.24-4.24-4.24-4.24z"/></svg>
+                    </button>
                     <button class="ctrl-btn" id="prevBtn" aria-label="Previous">
                         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg>
                     </button>
@@ -73,13 +73,15 @@
                     <button class="ctrl-btn" id="nextBtn" aria-label="Next">
                         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zm2-8.14 5.17 2.14L8 14.14V9.86zM16 6h2v12h-2z"/></svg>
                     </button>
+                    <button class="ctrl-btn ctrl-small" id="repeatBtn" aria-label="Repeat" title="Repeat off">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 7h10v3l4-4-4-4v3H5v6h2zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2z"/></svg>
+                    </button>
                 </div>
 
             </div>
 
         </header>
 
-        <!-- ── PLAYLIST ── -->
         <main class="main drift-bottom" id="mainContent">
 
             <section class="pl-section">
