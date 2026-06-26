@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════
-//   SARGAM — ENGINE v5.0
+//   SARGAM — ENGINE v5.0 (3D EDITION)
 // ═══════════════════════════════════════════════
 
 // ── 1. PLAYLIST DATA ──────────────────────────
@@ -39,7 +39,7 @@ catKeys.forEach(cat => {
 let currentIdx     = 0;
 let isPlaying      = false;
 let isShuffle      = false;
-let repeatMode     = 0; // 0=off 1=all 2=one
+let repeatMode     = 0; 
 let audioCtx       = null;
 let analyser       = null;
 let sourceNode     = null;
@@ -64,7 +64,7 @@ const repeatBtn  = document.getElementById('repeatBtn');
 const moodLabel  = document.getElementById('moodLabel');
 const beatRing   = document.getElementById('beatRing');
 const vizCanvas  = document.getElementById('vizCanvas');
-const vizCtx     = vizCanvas.getContext('2d');
+// (Old 2D context was deleted from here!)
 const nebCanvas  = document.getElementById('nebulaCanvas');
 const nebCtx     = nebCanvas.getContext('2d');
 const moodWash   = document.getElementById('moodWash');
@@ -134,46 +134,82 @@ function triggerMoodWash(washColor) {
 }
 
 // ══════════════════════════════════════════════
-//   VISUALIZER
+//   3D VISUALIZER (THREE.JS)
 // ══════════════════════════════════════════════
 vizCanvas.width = vizCanvas.height = 156;
+
+// 1. Setup 3D Scene
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer({ canvas: vizCanvas, alpha: true, antialias: true });
+renderer.setSize(156, 156);
+renderer.setPixelRatio(window.devicePixelRatio);
+
+// 2. Create the Geometric Sphere (Icosahedron)
+const geometry = new THREE.IcosahedronGeometry(1.2, 1); 
+const material = new THREE.MeshBasicMaterial({ 
+    color: 0xffffff, 
+    wireframe: true,
+    transparent: true,
+    opacity: 0.6
+});
+const sphere = new THREE.Mesh(geometry, material);
+scene.add(sphere);
+camera.position.z = 2.4;
+
 let lastBassAvg = 0;
+let beatRingTimeout = null;
 
-function drawViz() {
-    requestAnimationFrame(drawViz);
-    const cx=78, cy=78;
-    vizCtx.clearRect(0,0,156,156);
-    if (!analyser) {
-        vizCtx.beginPath(); vizCtx.arc(cx,cy,52,0,Math.PI*2);
-        vizCtx.strokeStyle=`rgba(${currentMoodRgb},.07)`; vizCtx.lineWidth=1; vizCtx.stroke();
-        return;
-    }
-    const freq=new Uint8Array(analyser.frequencyBinCount);
-    analyser.getByteFrequencyData(freq);
-    let bs=0; for(let b=0;b<6;b++) bs+=freq[b];
-    lastBassAvg+=(bs/6/255-lastBassAvg)*.22;
-    if(lastBassAvg>.5){ nebulaScale=1+lastBassAvg*.16; triggerBeatRing(); }
-    const step=Math.floor(freq.length/56);
-    for(let i=0;i<56;i++){
-        const v=freq[i*step]/255, ext=v*20+1.2;
-        const a=(i/56)*Math.PI*2-Math.PI/2;
-        vizCtx.beginPath();
-        vizCtx.moveTo(cx+Math.cos(a)*52,cy+Math.sin(a)*52);
-        vizCtx.lineTo(cx+Math.cos(a)*(52+ext),cy+Math.sin(a)*(52+ext));
-        vizCtx.strokeStyle=`rgba(${currentMoodRgb},${(.35+v*.65).toFixed(2)})`;
-        vizCtx.lineWidth=1.8; vizCtx.lineCap='round';
-        vizCtx.shadowColor=`rgba(${currentMoodRgb},.7)`; vizCtx.shadowBlur=3+v*8;
-        vizCtx.stroke();
-    }
-    vizCtx.shadowBlur=0;
-}
-
-let beatRingTimeout=null;
-function triggerBeatRing(){
+function triggerBeatRing() {
     beatRing.classList.remove('pulse'); void beatRing.offsetWidth;
     beatRing.classList.add('pulse');
     clearTimeout(beatRingTimeout);
-    beatRingTimeout=setTimeout(()=>beatRing.classList.remove('pulse'),400);
+    beatRingTimeout = setTimeout(() => beatRing.classList.remove('pulse'), 400);
+}
+
+// 3. The 3D Animation Loop
+function drawViz() {
+    requestAnimationFrame(drawViz);
+    
+    // Always rotate the sphere slowly
+    sphere.rotation.x += 0.003;
+    sphere.rotation.y += 0.005;
+
+    // Update the glowing color to match the current Mood
+    material.color.setStyle(`rgb(${currentMoodRgb})`);
+
+    if (!analyser) {
+        // Idle animation when paused
+        sphere.scale.set(1, 1, 1);
+        material.opacity = 0.2;
+    } else {
+        // Audio Reactive Animation
+        const freq = new Uint8Array(analyser.frequencyBinCount);
+        analyser.getByteFrequencyData(freq);
+        
+        // Calculate Bass
+        let bs = 0; 
+        for (let b = 0; b < 6; b++) bs += freq[b];
+        const currentBass = bs / 6 / 255;
+        
+        lastBassAvg += (currentBass - lastBassAvg) * 0.22;
+        
+        // Pulse the 3D sphere based on the bass!
+        const scale = 1 + (lastBassAvg * 0.5);
+        sphere.scale.set(scale, scale, scale);
+        
+        // Make it glow brighter on the beat
+        material.opacity = 0.3 + (lastBassAvg * 0.7);
+
+        // Trigger the background nebula & ring on heavy bass drops
+        if (lastBassAvg > 0.6) { 
+            nebulaScale = 1 + lastBassAvg * 0.16; 
+            triggerBeatRing(); 
+        }
+    }
+    
+    // Render the 3D frame
+    renderer.render(scene, camera);
 }
 
 // ══════════════════════════════════════════════
@@ -245,7 +281,6 @@ function loadTrack(idx, autoplay=true) {
     progressBar.value = 0;
     progressBar.style.setProperty('--progress', '0%');
     
-    // NEW: Update OS Lock Screen and save memory
     updateMediaSession(track);
     saveState();
     
@@ -399,7 +434,7 @@ function setupKeyboard() {
 }
 
 // ══════════════════════════════════════════════
-//   AUDIO EVENT LISTENERS (Time & Progress)
+//   AUDIO EVENT LISTENERS
 // ══════════════════════════════════════════════
 audio.addEventListener('loadedmetadata', () => {
     timeTot.textContent = fmt(audio.duration);
@@ -429,7 +464,7 @@ audio.addEventListener('ended', () => {
 });
 
 // ══════════════════════════════════════════════
-//   LOCAL STORAGE (Memory)
+//   LOCAL STORAGE
 // ══════════════════════════════════════════════
 function saveState() {
     const state = {
@@ -459,7 +494,7 @@ function loadState() {
 }
 
 // ══════════════════════════════════════════════
-//   MEDIA SESSION API (Lock Screen & Hardware Buttons)
+//   MEDIA SESSION API
 // ══════════════════════════════════════════════
 function setupMediaSession() {
     if ('mediaSession' in navigator) {
@@ -491,7 +526,7 @@ function initApp() {
     renderPlaylists();
     resizeNebula();
     drawNebula();
-    drawViz();
+    drawViz(); // Kicks off the Three.js loop!
 
     setupKeyboard();
     setupSwipe();
@@ -517,3 +552,4 @@ function initApp() {
 }
 
 document.addEventListener('DOMContentLoaded', initApp);
+                                                                       
