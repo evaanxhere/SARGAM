@@ -297,7 +297,15 @@ function updateHighlight() {
     const t=globalPlaylist[currentIdx];
     document.querySelector(`.song-item[data-cat="${t.category}"][data-idx="${t.localIndex}"]`)?.classList.add('active');
 }
-
+function autoScrollToActive()     updateHighlight(); 
+    // autoScrollToActive(); // <-- Disabled the annoying auto-scroll!
+{
+    const t=globalPlaylist[currentIdx];
+    setTimeout(()=>{
+        document.querySelector(`.song-item[data-cat="${t.category}"][data-idx="${t.localIndex}"]`)
+            ?.scrollIntoView({ behavior:'smooth', block:'nearest' });
+    },300);
+}
 
 
 // ══════════════════════════════════════════════
