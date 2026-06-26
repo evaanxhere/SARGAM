@@ -56,8 +56,7 @@ const stickerEl  = document.getElementById('stickerEmoji');
 const trackTitle = document.getElementById('playerTitle');
 const trackArtist= document.getElementById('playerArtist');
 const trackInfo  = document.getElementById('trackInfo');
-const waveCanvas = document.getElementById('waveCanvas');
-const waveCtx    = waveCanvas.getContext('2d');
+
 const timeCur    = document.getElementById('timeCurrent');
 const timeTot    = document.getElementById('timeTotal');
 const prevBtn    = document.getElementById('prevBtn');
@@ -73,115 +72,8 @@ const nebCtx     = nebCanvas.getContext('2d');
 const moodWash   = document.getElementById('moodWash');
 const playerCard = document.getElementById('playerCard');
 
-// ══════════════════════════════════════════════
-//   WAVEFORM ENGINE
-// ══════════════════════════════════════════════
-function setupWaveCanvas() {
-    const dpr = window.devicePixelRatio || 1;
-    const w   = waveCanvas.offsetWidth || 292;
-    const h   = 48;
-    waveCanvas.width  = w * dpr;
-    waveCanvas.height = h * dpr;
-    waveCtx.scale(dpr, dpr);
-    waveCanvas.style.width  = w + 'px';
-    waveCanvas.style.height = h + 'px';
-}
+const progressBar = document.getElementById('progressBar');
 
-async function loadWaveform(url) {
-    waveformData = null;
-    drawWaveform(0);
-    try {
-        const decodeCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const res       = await fetch(url);
-        const buf       = await res.arrayBuffer();
-        const decoded   = await decodeCtx.decodeAudioData(buf);
-        decodeCtx.close();
-        const raw   = decoded.getChannelData(0);
-        const peaks = 200;
-        const chunk = Math.floor(raw.length / peaks);
-        waveformData = new Float32Array(peaks);
-        for (let i = 0; i < peaks; i++) {
-            let max = 0;
-            for (let j = 0; j < chunk; j++) {
-                const v = Math.abs(raw[i * chunk + j]);
-                if (v > max) max = v;
-            }
-            waveformData[i] = max;
-        }
-        drawWaveform(audio.currentTime / (audio.duration || 1));
-    } catch (e) {
-        drawWaveformFallback(0);
-    }
-}
-
-function drawWaveform(progress) {
-    const w   = waveCanvas.offsetWidth || 292;
-    const h   = 48;
-    const dpr = window.devicePixelRatio || 1;
-    waveCtx.clearRect(0, 0, w * dpr, h * dpr);
-    if (!waveformData) { drawWaveformFallback(progress); return; }
-
-    const bars   = waveformData.length;
-    const barW   = w / bars;
-    const mid    = h / 2;
-    const cutoff = Math.floor(progress * bars);
-
-    for (let i = 0; i < bars; i++) {
-        const amp  = waveformData[i];
-        const barH = Math.max(2, amp * (h * 0.85));
-        const x    = i * barW;
-
-        if (i < cutoff) {
-            const grad = waveCtx.createLinearGradient(x, mid - barH/2, x, mid + barH/2);
-            grad.addColorStop(0,   `rgba(${currentMoodRgb},0.9)`);
-            grad.addColorStop(0.5, `rgba(${currentMoodRgb},1)`);
-            grad.addColorStop(1,   `rgba(${currentMoodRgb},0.6)`);
-            waveCtx.fillStyle  = grad;
-            waveCtx.shadowColor = `rgba(${currentMoodRgb},0.6)`;
-            waveCtx.shadowBlur  = 4;
-        } else {
-            waveCtx.fillStyle  = `rgba(255,255,255,0.1)`;
-            waveCtx.shadowBlur = 0;
-        }
-        waveCtx.beginPath();
-        waveCtx.roundRect(x, mid - barH/2, Math.max(1, barW - 1), barH, 1);
-        waveCtx.fill();
-    }
-    waveCtx.shadowBlur = 0;
-}
-
-function drawWaveformFallback(progress = 0) {
-    const w = waveCanvas.offsetWidth || 292;
-    const h = 48;
-    const mid = h / 2;
-    waveCtx.clearRect(0, 0, w, h);
-    waveCtx.fillStyle = 'rgba(255,255,255,0.06)';
-    waveCtx.beginPath();
-    waveCtx.roundRect(0, mid - 1, w, 2, 1);
-    waveCtx.fill();
-    if (progress > 0) {
-        const grad = waveCtx.createLinearGradient(0, 0, w, 0);
-        grad.addColorStop(0, `rgba(${currentMoodRgb},0.5)`);
-        grad.addColorStop(1, `rgba(${currentMoodRgb},1)`);
-        waveCtx.fillStyle = grad;
-        waveCtx.beginPath();
-        waveCtx.roundRect(0, mid - 1, w * progress, 2, 1);
-        waveCtx.fill();
-        waveCtx.fillStyle   = `rgba(${currentMoodRgb},1)`;
-        waveCtx.shadowColor = `rgba(${currentMoodRgb},0.8)`;
-        waveCtx.shadowBlur  = 6;
-        waveCtx.beginPath();
-        waveCtx.arc(w * progress, mid, 5, 0, Math.PI * 2);
-        waveCtx.fill();
-        waveCtx.shadowBlur = 0;
-    }
-}
-
-waveCanvas.addEventListener('click', e => {
-    if (!audio.duration) return;
-    const rect = waveCanvas.getBoundingClientRect();
-    audio.currentTime = ((e.clientX - rect.left) / rect.width) * audio.duration;
-});
 
 // ══════════════════════════════════════════════
 //   AMBIENT BACKGROUND
@@ -353,9 +245,9 @@ function loadTrack(idx, autoplay=true) {
     animateTrackChange(track, dir);
     stickerEl.textContent = '◈';
     timeCur.textContent = timeTot.textContent = '0:00';
-    waveformData = null; drawWaveform(0);
-    updateHighlight(); autoScrollToActive();
-    loadWaveform(track.url);
+    progressBar.value = 0;
+progressBar.style.setProperty('--progress', '0%');
+    
     if (autoplay) {
         initAudio();
         if (audioCtx.state==='suspended') audioCtx.resume();
@@ -516,6 +408,29 @@ audio.addEventListener('loadedmetadata', () => {
 
 // 2. As the track plays, update the current time and the progress bar
 audio.addEventListener('timeupdate', () => {
+    // Update time and the glow bar as the song plays
+audio.addEventListener('timeupdate', () => {
+    if (!audio.duration) return;
+    
+    timeCur.textContent = fmt(audio.currentTime);
+    
+    // Calculate progress as a percentage (0 to 100)
+    const progressPercent = (audio.currentTime / audio.duration) * 100;
+    
+    // Update the slider thumb position
+    progressBar.value = progressPercent;
+    
+    // Update the CSS variable to fill the glowing bar
+    progressBar.style.setProperty('--progress', `${progressPercent}%`);
+});
+
+// Let the user drag the slider to seek through the song
+progressBar.addEventListener('input', (e) => {
+    if (audio.duration) {
+        audio.currentTime = (e.target.value / 100) * audio.duration;
+    }
+});
+    
     // Prevent errors if the duration isn't loaded yet
     if (!audio.duration) return;
     
