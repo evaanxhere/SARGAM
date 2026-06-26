@@ -1,23 +1,15 @@
 // ═══════════════════════════════════════════════
-//   SARGAM — ENGINE v5.0 (3D EDITION)
+//   SARGAM — ENGINE v6.0 (LIVE API EDITION)
 // ═══════════════════════════════════════════════
 
-// ── 1. PLAYLIST DATA ──────────────────────────
-const playlistData = {
-    Bollywood: [
-        { title: "Fitoor",          artist: "Arijit Singh",      url: "music/bgmusic.mp3"  },
-        { title: "Saat Samundar",   artist: "Sadhana Sargam",    url: "music/bgmusic2.mp3" },
-        { title: "Tum Ho",          artist: "Mohit Chauhan",     url: "music/bgmusic3.mp3" }
-    ],
-    Punjabi: [
-        { title: "Channa",          artist: "Gippy Grewal",      url: "music/bgmusic4.mp3" },
-        { title: "Maar Sutiya",     artist: "Amrinder Gill",     url: "music/bgmusic5.mp3" }
-    ],
-    English: [
-        { title: "Espresso",        artist: "Sabrina Carpenter", url: "music/bgmusic6.mp3" },
-        { title: "Blinding Lights", artist: "The Weeknd",        url: "music/bgmusic7.mp3" }
-    ]
+// ── 1. PLAYLIST DATA (Now Dynamic!) ───────────
+let playlistData = {
+    Bollywood: [],
+    Punjabi: [],
+    English: []
 };
+
+let globalPlaylist = [];
 
 // ── 2. MOOD CONFIG ────────────────────────────
 const moodConfig = {
@@ -26,16 +18,7 @@ const moodConfig = {
     English:   { label: "ਅੰਗਰੇਜ਼ੀ",   cls: "mood-English",   rgb: "103,232,249", washColor: "rgba(103,232,249,0.14)" }
 };
 
-// ── 3. GLOBAL PLAYLIST ────────────────────────
-const globalPlaylist = [];
-const catKeys = Object.keys(playlistData);
-catKeys.forEach(cat => {
-    playlistData[cat].forEach((track, i) => {
-        globalPlaylist.push({ ...track, category: cat, localIndex: i });
-    });
-});
-
-// ── 4. STATE ──────────────────────────────────
+// ── 3. STATE & DOM REFS ───────────────────────
 let currentIdx     = 0;
 let isPlaying      = false;
 let isShuffle      = false;
@@ -45,7 +28,6 @@ let analyser       = null;
 let sourceNode     = null;
 let currentMoodRgb = "201,168,76";
 
-// ── 5. DOM REFS ───────────────────────────────
 const audio      = document.getElementById('mainAudio');
 const playBtn    = document.getElementById('playButton');
 const playIcon   = document.getElementById('playIcon');
@@ -64,12 +46,78 @@ const repeatBtn  = document.getElementById('repeatBtn');
 const moodLabel  = document.getElementById('moodLabel');
 const beatRing   = document.getElementById('beatRing');
 const vizCanvas  = document.getElementById('vizCanvas');
-// (Old 2D context was deleted from here!)
 const nebCanvas  = document.getElementById('nebulaCanvas');
 const nebCtx     = nebCanvas.getContext('2d');
 const moodWash   = document.getElementById('moodWash');
 const playerCard = document.getElementById('playerCard');
 const progressBar = document.getElementById('progressBar');
+
+// ══════════════════════════════════════════════
+//   JIOSAAVN LIVE API FETCHER
+// ══════════════════════════════════════════════
+async function loadLiveMusic() {
+    moodLabel.textContent = "Connecting to JioSaavn...";
+
+    // You can change these search terms to whatever artists you want!
+    const queries = {
+        Bollywood: "Arijit Singh",
+        Punjabi: "Diljit Dosanjh",
+        English: "The Weeknd"
+    };
+
+    let successCount = 0;
+
+    for (const cat of Object.keys(queries)) {
+        try {
+            // Fetching from the open-source JioSaavn wrapper
+            const res = await fetch(`https://saavn.dev/api/search/songs?query=${queries[cat]}&limit=5`);
+            const json = await res.json();
+            
+            if (json && json.success && json.data && json.data.results) {
+                playlistData[cat] = json.data.results.map((song) => {
+                    
+                    // Grab the highest quality audio URL
+                    const audioUrl = song.downloadUrl?.find(d => d.quality === '320kbps')?.url || song.downloadUrl?.[0]?.url || '';
+                    
+                    // Grab the highest resolution album art
+                    const imgUrl = song.image?.find(img => img.quality === '500x500')?.url || song.image?.[0]?.url || '';
+                    
+                    // Clean up weird HTML text formatting
+                    const cleanTitle = song.name.replace(/&quot;/g, '"').replace(/&amp;/g, '&');
+                    const artistName = song.primaryArtists || 'Unknown Artist';
+
+                    return {
+                        title: cleanTitle,
+                        artist: artistName,
+                        url: audioUrl,
+                        image: imgUrl,
+                        duration: song.duration || 0, // Got the exact duration from the API!
+                        category: cat
+                    };
+                }).filter(t => t.url); // Remove broken tracks
+                
+                successCount++;
+            }
+        } catch (e) {
+            console.log(`Failed to fetch ${cat}:`, e);
+        }
+    }
+
+    // Fallback just in case the API goes down
+    if (successCount === 0) {
+        alert("API Offline. Please try again later.");
+        return;
+    }
+
+    // Rebuild the global playlist dynamically
+    globalPlaylist = [];
+    Object.keys(playlistData).forEach(cat => {
+        playlistData[cat].forEach((track, i) => {
+            track.localIndex = i; 
+            globalPlaylist.push(track);
+        });
+    });
+}
 
 // ══════════════════════════════════════════════
 //   AMBIENT BACKGROUND
@@ -137,15 +185,12 @@ function triggerMoodWash(washColor) {
 //   3D VISUALIZER (THREE.JS)
 // ══════════════════════════════════════════════
 vizCanvas.width = vizCanvas.height = 156;
-
-// 1. Setup 3D Scene
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer({ canvas: vizCanvas, alpha: true, antialias: true });
 renderer.setSize(156, 156);
 renderer.setPixelRatio(window.devicePixelRatio);
 
-// 2. Create the Geometric Sphere (Icosahedron)
 const geometry = new THREE.IcosahedronGeometry(1.2, 1); 
 const material = new THREE.MeshBasicMaterial({ 
     color: 0xffffff, 
@@ -167,48 +212,32 @@ function triggerBeatRing() {
     beatRingTimeout = setTimeout(() => beatRing.classList.remove('pulse'), 400);
 }
 
-// 3. The 3D Animation Loop
 function drawViz() {
     requestAnimationFrame(drawViz);
-    
-    // Always rotate the sphere slowly
     sphere.rotation.x += 0.003;
     sphere.rotation.y += 0.005;
-
-    // Update the glowing color to match the current Mood
     material.color.setStyle(`rgb(${currentMoodRgb})`);
 
     if (!analyser) {
-        // Idle animation when paused
         sphere.scale.set(1, 1, 1);
         material.opacity = 0.2;
     } else {
-        // Audio Reactive Animation
         const freq = new Uint8Array(analyser.frequencyBinCount);
         analyser.getByteFrequencyData(freq);
-        
-        // Calculate Bass
         let bs = 0; 
         for (let b = 0; b < 6; b++) bs += freq[b];
         const currentBass = bs / 6 / 255;
         
         lastBassAvg += (currentBass - lastBassAvg) * 0.22;
-        
-        // Pulse the 3D sphere based on the bass!
         const scale = 1 + (lastBassAvg * 0.5);
         sphere.scale.set(scale, scale, scale);
-        
-        // Make it glow brighter on the beat
         material.opacity = 0.3 + (lastBassAvg * 0.7);
 
-        // Trigger the background nebula & ring on heavy bass drops
         if (lastBassAvg > 0.6) { 
             nebulaScale = 1 + lastBassAvg * 0.16; 
             triggerBeatRing(); 
         }
     }
-    
-    // Render the 3D frame
     renderer.render(scene, camera);
 }
 
@@ -276,7 +305,10 @@ function loadTrack(idx, autoplay=true) {
     setMood(track.category);
     animateTrackChange(track, dir);
     stickerEl.textContent = '◈';
-    timeCur.textContent = timeTot.textContent = '0:00';
+    
+    // Uses the new API duration!
+    timeTot.textContent = fmt(track.duration);
+    timeCur.textContent = '0:00';
     
     progressBar.value = 0;
     progressBar.style.setProperty('--progress', '0%');
@@ -336,6 +368,7 @@ function updateHighlight() {
 //   RENDER PLAYLISTS
 // ══════════════════════════════════════════════
 function renderPlaylists() {
+    catKeys = Object.keys(playlistData);
     catKeys.forEach(cat=>{
         const container=document.getElementById(`playlist-${cat}`);
         const countEl=document.getElementById(`count-${cat}`);
@@ -355,17 +388,13 @@ function renderPlaylists() {
                 </div>
                 <div class="song-right">
                     <span class="song-artist">${song.artist}</span>
-                    <span class="song-dur" data-src="${song.url}">—:——</span>
+                    <span class="song-dur">${fmt(song.duration)}</span>
                     <span class="song-wave" aria-hidden="true">
                         <span class="wave-bar"></span><span class="wave-bar"></span><span class="wave-bar"></span>
                     </span>
                 </div>`;
             container.appendChild(row);
         });
-    });
-    document.querySelectorAll('.song-dur[data-src]').forEach(el=>{
-        const tmp=new Audio(); tmp.preload='metadata'; tmp.src=el.dataset.src;
-        tmp.addEventListener('loadedmetadata',()=>{ el.textContent=fmt(tmp.duration); tmp.src=''; });
     });
 }
 
@@ -436,10 +465,6 @@ function setupKeyboard() {
 // ══════════════════════════════════════════════
 //   AUDIO EVENT LISTENERS
 // ══════════════════════════════════════════════
-audio.addEventListener('loadedmetadata', () => {
-    timeTot.textContent = fmt(audio.duration);
-});
-
 audio.addEventListener('timeupdate', () => {
     if (!audio.duration) return;
     timeCur.textContent = fmt(audio.currentTime);
@@ -494,7 +519,7 @@ function loadState() {
 }
 
 // ══════════════════════════════════════════════
-//   MEDIA SESSION API
+//   MEDIA SESSION API (Now Uses Real Album Art!)
 // ══════════════════════════════════════════════
 function setupMediaSession() {
     if ('mediaSession' in navigator) {
@@ -512,22 +537,27 @@ function updateMediaSession(track) {
             artist: track.artist,
             album: `SARGAM - ${track.category}`,
             artwork: [
-                { src: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=512&auto=format&fit=crop', sizes: '512x512', type: 'image/jpeg' }
+                { src: track.image || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=512&auto=format&fit=crop', sizes: '512x512', type: 'image/jpeg' }
             ]
         });
     }
 }
 
 // ══════════════════════════════════════════════
-//   APP INITIALIZATION
+//   APP INITIALIZATION (Async to wait for API)
 // ══════════════════════════════════════════════
-function initApp() {
+async function initApp() {
+    // 1. Fetch real music from JioSaavn first!
+    await loadLiveMusic();
+    
+    // 2. Load memory and render
     loadState();
     renderPlaylists();
     resizeNebula();
     drawNebula();
-    drawViz(); // Kicks off the Three.js loop!
+    drawViz(); 
 
+    // 3. Connect controls
     setupKeyboard();
     setupSwipe();
     setupMagneticHover();
@@ -540,7 +570,9 @@ function initApp() {
     repeatBtn.addEventListener('click', toggleRepeat);
     window.addEventListener('resize', resizeNebula);
 
+    // 4. Start the player safely
     if (globalPlaylist.length > 0) {
+        if (currentIdx >= globalPlaylist.length) currentIdx = 0; 
         loadTrack(currentIdx, false); 
     }
 
@@ -552,4 +584,3 @@ function initApp() {
 }
 
 document.addEventListener('DOMContentLoaded', initApp);
-                                                                       
