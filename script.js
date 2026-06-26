@@ -505,6 +505,40 @@ function setupKeyboard() {
         }
     });
 }
+// ══════════════════════════════════════════════
+//   AUDIO EVENT LISTENERS (Time & Progress)
+// ══════════════════════════════════════════════
+
+// 1. When a new track loads, get its total length
+audio.addEventListener('loadedmetadata', () => {
+    timeTot.textContent = fmt(audio.duration);
+});
+
+// 2. As the track plays, update the current time and the progress bar
+audio.addEventListener('timeupdate', () => {
+    // Prevent errors if the duration isn't loaded yet
+    if (!audio.duration) return;
+    
+    // Update the "0:00" text for current time
+    timeCur.textContent = fmt(audio.currentTime);
+    
+    // Calculate the percentage of the song played (between 0.0 and 1.0)
+    const progress = audio.currentTime / audio.duration;
+    
+    // Animate the waveform or the fallback progress bar
+    drawWaveform(progress);
+});
+
+// 3. When the track finishes, figure out what to do next
+audio.addEventListener('ended', () => {
+    // If "Repeat One" is active, start over. Otherwise, play the next track.
+    if (repeatMode === 2) { 
+        audio.currentTime = 0;
+        audio.play();
+    } else {
+        playNext();
+    }
+});
 
 // ══════════════════════
 // ══════════════════════════════════════════════
