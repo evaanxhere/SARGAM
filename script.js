@@ -1,32 +1,32 @@
 // ═══════════════════════════════════════════════
-//   SARGAM — COSMIC ENGINE v3.0
-//   Nebula · Beat Detection · Magnetic Hover
+//   SARGAM — ENGINE v4.0
+//   Ambient ink wash · Beat Detection
 //   Drift-In Entrance · Track Slide Transition
 // ═══════════════════════════════════════════════
 
 // ── 1. PLAYLIST DATA ──────────────────────────
-// UPDATE your song urls here. Keep music/ prefix for local files.
 const playlistData = {
     Bollywood: [
-        { title: "Fitoor",   artist: "Arijit Singh",                    url: "music/bgmusic.mp3",badge: "💫" },
-        { title: "Saat samundar",  artist: "Sadhana Sargam",       url: "music/bgmusic2.mp3", badge: "🌊"   },
-        { title: "Tum ho",    artist: "Mohit Chauhan",           url: "music/bgmusic3.mp3",  badge: "💞"  }
+        { title: "Fitoor",          artist: "Arijit Singh",     url: "music/bgmusic.mp3"  },
+        { title: "Saat Samundar",   artist: "Sadhana Sargam",   url: "music/bgmusic2.mp3" },
+        { title: "Tum Ho",          artist: "Mohit Chauhan",    url: "music/bgmusic3.mp3" }
     ],
     Punjabi: [
-        { title: "Channa", artist: "Gippy Grewal", url: "music/bgmusic4.mp3", badge: "🌙"  },
-        { title: "Maar sutiya",artist: "Amrinder Gill",  url: "music/bgmusic5.mp3", badge: "🕺🏻" }
+        { title: "Channa",          artist: "Gippy Grewal",     url: "music/bgmusic4.mp3" },
+        { title: "Maar Sutiya",     artist: "Amrinder Gill",    url: "music/bgmusic5.mp3" }
     ],
     English: [
-        { title: "Espresso",     artist: "Sabrina Carpenter",       url: "music/bgmusic6.mp3", badge: "☕"  },
-        { title: "Blinding Lights",artist: "The Weeknd",  url: "music/bgmusic7.mp3",   badge: "💡" }
+        { title: "Espresso",        artist: "Sabrina Carpenter",url: "music/bgmusic6.mp3" },
+        { title: "Blinding Lights", artist: "The Weeknd",       url: "music/bgmusic7.mp3" }
     ]
 };
 
 // ── 2. MOOD CONFIG ────────────────────────────
+// cls must match body.mood-* in CSS exactly
 const moodConfig = {
-    Bollywood:   { label: "ਬਾਲੀਵੁੱਡ",  cls: "mood-Bollywood",   hex: "#f59e0b", rgb: "245,158,11"  },
-    Punjabi: { label: "ਪੰਜਾਬੀ",     cls: "mood-Punjabi", hex: "#f43f5e", rgb: "244,63,94"   },
-    English:   { label: "ਅੰਗਰੇਜ਼ੀ",      cls: "mood-English",   hex: "#22d3ee", rgb: "34,211,238"  }
+    Bollywood: { label: "ਬਾਲੀਵੁੱਡ", cls: "mood-Bollywood", rgb: "245,158,11"   },
+    Punjabi:   { label: "ਪੰਜਾਬੀ",   cls: "mood-Punjabi",   rgb: "244,114,182"  },
+    English:   { label: "ਅੰਗਰੇਜ਼ੀ",   cls: "mood-English",   rgb: "103,232,249"  }
 };
 
 // ── 3. GLOBAL PLAYLIST ────────────────────────
@@ -39,12 +39,12 @@ catKeys.forEach(cat => {
 });
 
 // ── 4. STATE ──────────────────────────────────
-let currentIdx  = 0;
-let isPlaying   = false;
-let audioCtx    = null;
-let analyser    = null;
-let sourceNode  = null;
-let currentMoodRgb = "167,139,250";
+let currentIdx     = 0;
+let isPlaying      = false;
+let audioCtx       = null;
+let analyser       = null;
+let sourceNode     = null;
+let currentMoodRgb = "201,168,76";
 
 // ── 5. DOM REFS ───────────────────────────────
 const audio       = document.getElementById('mainAudio');
@@ -52,7 +52,7 @@ const playBtn     = document.getElementById('playButton');
 const playIcon    = document.getElementById('playIcon');
 const pauseIcon   = document.getElementById('pauseIcon');
 const vinyl       = document.getElementById('vinylDisk');
-const sticker     = document.getElementById('stickerEmoji');
+const stickerEl   = document.getElementById('stickerEmoji');
 const trackTitle  = document.getElementById('playerTitle');
 const trackArtist = document.getElementById('playerArtist');
 const trackInfo   = document.getElementById('trackInfo');
@@ -64,7 +64,6 @@ const timeTot     = document.getElementById('timeTotal');
 const prevBtn     = document.getElementById('prevBtn');
 const nextBtn     = document.getElementById('nextBtn');
 const moodLabel   = document.getElementById('moodLabel');
-const moodDot     = document.getElementById('moodDot');
 const beatRing    = document.getElementById('beatRing');
 const vizCanvas   = document.getElementById('vizCanvas');
 const vizCtx      = vizCanvas.getContext('2d');
@@ -72,113 +71,117 @@ const nebCanvas   = document.getElementById('nebulaCanvas');
 const nebCtx      = nebCanvas.getContext('2d');
 
 // ══════════════════════════════════════════════
-//   NEBULA BACKGROUND ENGINE
+//   AMBIENT INK-WASH BACKGROUND
 // ══════════════════════════════════════════════
-const nebulaClouds = [];
-let nebulaScale = 1.0; // beat pushes this up
+const inkBlobs = [];
+const stars    = [];
 
 function resizeNebula() {
     nebCanvas.width  = window.innerWidth;
     nebCanvas.height = window.innerHeight;
-    buildNebulaClouds();
+    buildScene();
 }
 
-// Add this new stars array near top with other globals (after nebulaClouds = [])
-const stars = [];
-
-// Replace buildNebulaClouds
-function buildNebulaClouds() {
-    nebulaClouds.length = 0;
-    stars.length = 0;  // reset stars
+function buildScene() {
+    inkBlobs.length = 0;
+    stars.length = 0;
     const W = nebCanvas.width;
     const H = nebCanvas.height;
-    
-    // Nebula clouds
+
+    // Ink wash blobs — visible, slow-breathing
     const positions = [
-        { x: 0.5, y: 0.15, r: 0.55 },
-        { x: 0.15, y: 0.6,  r: 0.40 },
-        { x: 0.85, y: 0.5,  r: 0.38 },
-        { x: 0.5,  y: 0.85, r: 0.35 },
-        { x: 0.3,  y: 0.25, r: 0.28 }
+        { x: 0.5,  y: 0.18, r: 0.48 },
+        { x: 0.12, y: 0.65, r: 0.34 },
+        { x: 0.88, y: 0.55, r: 0.32 },
+        { x: 0.5,  y: 0.82, r: 0.30 },
+        { x: 0.28, y: 0.38, r: 0.22 }
     ];
     positions.forEach(p => {
-        nebulaClouds.push({
-            x: p.x * W, y: p.y * H,
+        inkBlobs.push({
+            x: p.x * W,
+            y: p.y * H,
             baseR: p.r * Math.min(W, H),
             phase: Math.random() * Math.PI * 2,
-            speed: 0.00025 + Math.random() * 0.0003
+            speed: 0.0002 + Math.random() * 0.00025
         });
     });
 
-    // ✨ Twinkling stars for premium depth
-    for (let i = 0; i < 220; i++) {
+    // Fine stars
+    for (let i = 0; i < 180; i++) {
         stars.push({
             x: Math.random() * W,
             y: Math.random() * H,
-            size: Math.random() * 1.6 + 0.5,
-            alpha: Math.random() * 0.7 + 0.4,
-            speed: Math.random() * 0.018 + 0.007
+            size: Math.random() * 1.4 + 0.3,
+            alpha: Math.random() * 0.5 + 0.2,
+            speed: Math.random() * 0.014 + 0.006
         });
     }
 }
 
-function drawNebula(ts) {
+let nebulaScale = 1.0;
+
+function drawNebula() {
     const W = nebCanvas.width;
     const H = nebCanvas.height;
     nebCtx.clearRect(0, 0, W, H);
 
-    // Deeper space gradient
-    const bg = nebCtx.createRadialGradient(W/2, H*0.35, 0, W/2, H*0.9, Math.max(W,H)*1.15);
-    bg.addColorStop(0, `rgba(${currentMoodRgb},0.11)`);
-    bg.addColorStop(0.45, `rgba(12,9,28,0.75)`);
-    bg.addColorStop(1, '#020106');
-    nebCtx.fillStyle = bg;
+    // Deep ground
+    nebCtx.fillStyle = '#08070f';
     nebCtx.fillRect(0, 0, W, H);
 
-    // Twinkling stars
+    // Stars
     stars.forEach((s, i) => {
-        const twinkle = Math.sin(Date.now() * s.speed * 0.001 + i) * 0.5 + 0.5;
-        nebCtx.fillStyle = `rgba(245,245,255,${s.alpha * twinkle})`;
+        const twinkle = Math.sin(Date.now() * s.speed * 0.001 + i) * 0.4 + 0.6;
+        nebCtx.fillStyle = `rgba(240,235,220,${(s.alpha * twinkle).toFixed(3)})`;
         nebCtx.fillRect(s.x, s.y, s.size, s.size);
     });
 
-    // Enhanced nebula clouds
-    nebulaClouds.forEach((c, i) => {
+    // Ink-wash blobs — richer opacity so they're actually visible
+    inkBlobs.forEach((c, i) => {
         c.phase += c.speed;
-        const breathe = 1 + 0.085 * Math.sin(c.phase * 1.15);
-        const beat = i < 2 ? nebulaScale * 1.2 : 1 + (nebulaScale - 1) * 0.55;
+        const breathe = 1 + 0.07 * Math.sin(c.phase);
+        const beat    = i < 2 ? nebulaScale * 1.15 : 1 + (nebulaScale - 1) * 0.5;
         const r = c.baseR * breathe * beat;
 
-        const grad = nebCtx.createRadialGradient(c.x, c.y, r*0.18, c.x, c.y, r * 1.1);
-        grad.addColorStop(0, `rgba(${currentMoodRgb},0.09)`);
-        grad.addColorStop(0.4, `rgba(${currentMoodRgb},0.038)`);
-        grad.addColorStop(1, 'rgba(6,4,22,0)');
+        const grad = nebCtx.createRadialGradient(c.x, c.y, r * 0.1, c.x, c.y, r);
+        grad.addColorStop(0,   `rgba(${currentMoodRgb},0.13)`);
+        grad.addColorStop(0.35,`rgba(${currentMoodRgb},0.055)`);
+        grad.addColorStop(0.7, `rgba(${currentMoodRgb},0.018)`);
+        grad.addColorStop(1,   `rgba(${currentMoodRgb},0)`);
         nebCtx.fillStyle = grad;
         nebCtx.fillRect(0, 0, W, H);
     });
 
-    nebulaScale += (1 - nebulaScale) * 0.09;
+    // Central soft radial vignette (darkens edges, keeps center alive)
+    const vignette = nebCtx.createRadialGradient(W/2, H*0.3, 0, W/2, H, Math.max(W,H)*0.85);
+    vignette.addColorStop(0,   'rgba(8,7,15,0)');
+    vignette.addColorStop(0.6, 'rgba(8,7,15,0.35)');
+    vignette.addColorStop(1,   'rgba(8,7,15,0.8)');
+    nebCtx.fillStyle = vignette;
+    nebCtx.fillRect(0, 0, W, H);
+
+    nebulaScale += (1 - nebulaScale) * 0.08;
     requestAnimationFrame(drawNebula);
 }
 
 // ══════════════════════════════════════════════
-//   CIRCULAR VISUALIZER ENGINE
+//   CIRCULAR VISUALIZER
 // ══════════════════════════════════════════════
-vizCanvas.width  = 170;
-vizCanvas.height = 170;
+vizCanvas.width  = 156;
+vizCanvas.height = 156;
 
 let lastBassAvg = 0;
 
 function drawViz() {
     requestAnimationFrame(drawViz);
-    const W = 170, H = 170, cx = W/2, cy = H/2;
+    const W = 156, H = 156, cx = W/2, cy = H/2;
     vizCtx.clearRect(0, 0, W, H);
 
     if (!analyser) {
         // Idle ghost ring
         vizCtx.beginPath();
-        vizCtx.arc(cx, cy, 58, 0, Math.PI*2);
-        vizCtx.strokeStyle = `rgba(${currentMoodRgb},0.08)`;
+        vizCtx.arc(cx, cy, 52, 0, Math.PI*2);
+        vizCtx.strokeStyle = `rgba(${currentMoodRgb},0.07)`;
         vizCtx.lineWidth = 1;
         vizCtx.stroke();
         return;
@@ -188,31 +191,25 @@ function drawViz() {
     const freq   = new Uint8Array(bufLen);
     analyser.getByteFrequencyData(freq);
 
-    // Bass detection (bins 0–6)
     let bassSum = 0;
     for (let b = 0; b < 6; b++) bassSum += freq[b];
     const bassAvg = bassSum / 6 / 255;
+    lastBassAvg += (bassAvg - lastBassAvg) * 0.22;
 
-    // Smooth bass
-    lastBassAvg += (bassAvg - lastBassAvg) * 0.25;
-
-    // Trigger beat pulse when bass spikes
-    if (lastBassAvg > 0.55) {
-        nebulaScale = 1 + lastBassAvg * 0.18;
+    if (lastBassAvg > 0.5) {
+        nebulaScale = 1 + lastBassAvg * 0.16;
         triggerBeatRing();
     }
 
-    // Draw radial bars
-    const bars   = 60;
-    const step   = Math.floor(bufLen / bars);
-    const baseR  = 57;
-    const maxExt = 24;
+    const bars  = 56;
+    const step  = Math.floor(bufLen / bars);
+    const baseR = 52;
+    const maxExt = 20;
 
     for (let i = 0; i < bars; i++) {
         const v     = freq[i * step] / 255;
-        const ext   = v * maxExt + 1.5;
+        const ext   = v * maxExt + 1.2;
         const angle = (i / bars) * Math.PI * 2 - Math.PI / 2;
-
         const x1 = cx + Math.cos(angle) * baseR;
         const y1 = cy + Math.sin(angle) * baseR;
         const x2 = cx + Math.cos(angle) * (baseR + ext);
@@ -221,11 +218,11 @@ function drawViz() {
         vizCtx.beginPath();
         vizCtx.moveTo(x1, y1);
         vizCtx.lineTo(x2, y2);
-        vizCtx.strokeStyle = `rgba(${currentMoodRgb},${(0.4 + v * 0.6).toFixed(2)})`;
-        vizCtx.lineWidth   = 2;
-        vizCtx.lineCap     = 'round';
-        vizCtx.shadowColor = `rgba(${currentMoodRgb},0.8)`;
-        vizCtx.shadowBlur  = 4 + v * 10;
+        vizCtx.strokeStyle = `rgba(${currentMoodRgb},${(0.35 + v * 0.65).toFixed(2)})`;
+        vizCtx.lineWidth = 1.8;
+        vizCtx.lineCap   = 'round';
+        vizCtx.shadowColor = `rgba(${currentMoodRgb},0.7)`;
+        vizCtx.shadowBlur  = 3 + v * 8;
         vizCtx.stroke();
     }
     vizCtx.shadowBlur = 0;
@@ -234,10 +231,10 @@ function drawViz() {
 let beatRingTimeout = null;
 function triggerBeatRing() {
     beatRing.classList.remove('pulse');
-    void beatRing.offsetWidth; // reflow to restart animation
+    void beatRing.offsetWidth;
     beatRing.classList.add('pulse');
     clearTimeout(beatRingTimeout);
-    beatRingTimeout = setTimeout(() => beatRing.classList.remove('pulse'), 350);
+    beatRingTimeout = setTimeout(() => beatRing.classList.remove('pulse'), 400);
 }
 
 // ══════════════════════════════════════════════
@@ -246,14 +243,18 @@ function triggerBeatRing() {
 function setMood(category) {
     const m = moodConfig[category];
     if (!m) return;
-    document.body.classList.remove('mood-Bollywood', 'mood-Punjabi', 'mood-English');
+    // Remove all mood classes then add the right one
+    Object.values(moodConfig).forEach(cfg => document.body.classList.remove(cfg.cls));
     document.body.classList.add(m.cls);
-    moodLabel.textContent  = m.label;
+    moodLabel.textContent = m.label;
     currentMoodRgb = m.rgb;
+
+    // Also update the CSS custom property so canvas colors update instantly
+    document.documentElement.style.setProperty('--mrgb', m.rgb);
 }
 
 // ══════════════════════════════════════════════
-//   WEB AUDIO INIT
+//   WEB AUDIO
 // ══════════════════════════════════════════════
 function initAudio() {
     if (audioCtx) return;
@@ -271,46 +272,43 @@ function initAudio() {
 let prevTrackIdx = null;
 
 function loadTrack(idx, autoplay = true) {
-    const direction = (prevTrackIdx === null || idx > prevTrackIdx) ? 'next' : 'prev';
-    prevTrackIdx = idx;
-    currentIdx   = idx;
+    const direction  = (prevTrackIdx === null || idx > prevTrackIdx) ? 'next' : 'prev';
+    prevTrackIdx     = idx;
+    currentIdx       = idx;
 
-    const track = globalPlaylist[currentIdx];
-    audio.src   = track.url;
-
+    const track  = globalPlaylist[currentIdx];
+    audio.src    = track.url;
     setMood(track.category);
     animateTrackChange(track, direction);
-    sticker.textContent = track.badge;
+
+    // Update vinyl center — clean symbol instead of emoji
+    stickerEl.textContent = '◈';
 
     timelineFl.style.width = '0%';
     timeCur.textContent    = '0:00';
     timeTot.textContent    = '0:00';
-
     updateHighlight();
 
     if (autoplay) {
         initAudio();
         if (audioCtx.state === 'suspended') audioCtx.resume();
         audio.play()
-            .then(() => { isPlaying = true; setPlayVisuals(true); })
+            .then(() => { isPlaying = true; setPlayVisuals(true); updateHighlight(); })
             .catch(e => console.log('Playback:', e));
     }
 }
 
-// Slide track info out → update → slide in
 function animateTrackChange(track, direction) {
     const exitClass  = direction === 'next' ? 'exit-left'  : 'exit-right';
     const enterClass = direction === 'next' ? 'enter-left' : 'enter-right';
-
     trackInfo.classList.add(exitClass);
-
     setTimeout(() => {
         trackTitle.textContent  = track.title;
         trackArtist.textContent = track.artist;
         trackInfo.classList.remove(exitClass);
         trackInfo.classList.add(enterClass);
-        setTimeout(() => trackInfo.classList.remove(enterClass), 500);
-    }, 220);
+        setTimeout(() => trackInfo.classList.remove(enterClass), 480);
+    }, 200);
 }
 
 function togglePlay() {
@@ -329,48 +327,32 @@ function togglePlay() {
 }
 
 function setPlayVisuals(playing) {
-    if (playing) {
-        playIcon.style.display  = 'none';
-        pauseIcon.style.display = 'block';
-        vinyl.classList.add('spinning');
-    } else {
-        playIcon.style.display  = 'block';
-        pauseIcon.style.display = 'none';
-        vinyl.classList.remove('spinning');
-    }
+    playIcon.style.display  = playing ? 'none'  : 'block';
+    pauseIcon.style.display = playing ? 'block' : 'none';
+    playing ? vinyl.classList.add('spinning') : vinyl.classList.remove('spinning');
 }
 
 function playNext() {
-    let n = currentIdx + 1;
-    if (n >= globalPlaylist.length) n = 0;
-    loadTrack(n, true);
+    loadTrack((currentIdx + 1) % globalPlaylist.length, true);
 }
-
 function playPrev() {
-    let p = currentIdx - 1;
-    if (p < 0) p = globalPlaylist.length - 1;
-    loadTrack(p, true);
+    loadTrack((currentIdx - 1 + globalPlaylist.length) % globalPlaylist.length, true);
 }
 
 function updateHighlight() {
     document.querySelectorAll('.song-item').forEach(el => {
         el.classList.remove('active');
         const meta = el.querySelector('.song-meta');
-        if (meta) {
-            const m = el.className.match(/cat-(\w+)\s+idx-(\d+)/);
-            if (m) meta.textContent = `T${parseInt(m[2]) + 1}`;
-            meta.classList.remove('playing');
-        }
+        if (meta) meta.classList.remove('playing');
     });
 
     const active = globalPlaylist[currentIdx];
-    const row = document.querySelector(`.song-item.cat-${active.category}.idx-${active.localIndex}`);
+    const row = document.querySelector(`.song-item[data-cat="${active.category}"][data-idx="${active.localIndex}"]`);
     if (row) {
         row.classList.add('active');
-        const meta = row.querySelector('.song-meta');
-        if (meta && isPlaying) {
-            meta.textContent = '⚡';
-            meta.classList.add('playing');
+        if (isPlaying) {
+            const meta = row.querySelector('.song-meta');
+            if (meta) meta.classList.add('playing');
         }
     }
 }
@@ -381,53 +363,47 @@ function fmt(s) {
 }
 
 // ══════════════════════════════════════════════
-// ══════════════════════════════════════════════
-//   RENDER PLAYLISTS & SCROLL REVEAL
+//   RENDER PLAYLISTS
 // ══════════════════════════════════════════════
 function renderPlaylists() {
     catKeys.forEach(cat => {
         const container = document.getElementById(`playlist-${cat}`);
+        const countEl   = document.getElementById(`count-${cat}`);
         if (!container) return;
+
+        const songs = playlistData[cat];
+        if (countEl) countEl.textContent = `${songs.length} tracks`;
+
         container.innerHTML = '';
-        playlistData[cat].forEach((song, i) => {
+        songs.forEach((song, i) => {
             const gIdx = globalPlaylist.findIndex(t => t.category === cat && t.localIndex === i);
             const row  = document.createElement('div');
-            row.className = `song-item cat-${cat} idx-${i}`;
-            row.onclick   = () => loadTrack(gIdx, true);
-            
-            // Add a slight delay based on the index so they cascade in nicely
-            row.style.transitionDelay = `${i * 0.08}s, ${i * 0.08}s, 0s, 0s, 0s`;
-
+            row.className = 'song-item';
+            row.dataset.cat = cat;
+            row.dataset.idx = i;
+            row.onclick = () => loadTrack(gIdx, true);
             row.innerHTML = `
                 <div class="song-left">
-                    <span class="song-badge">${song.badge}</span>
+                    <span class="song-num">${i + 1}</span>
                     <span class="song-name">${song.title}</span>
                 </div>
-                <span class="song-meta">T${i+1}</span>
+                <div class="song-right">
+                    <span class="song-artist">${song.artist}</span>
+                    <span class="song-meta">T${i+1}</span>
+                    <span class="song-wave" aria-hidden="true">
+                        <span class="wave-bar"></span>
+                        <span class="wave-bar"></span>
+                        <span class="wave-bar"></span>
+                    </span>
+                </div>
             `;
             container.appendChild(row);
         });
     });
-
-    // Premium Interactive Scroll Reveal
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-                observer.unobserve(entry.target); // Only animate once
-            }
-        });
-    }, { 
-        threshold: 0.1, // Trigger when 10% of the item is visible
-        rootMargin: "0px 0px -20px 0px" // Trigger slightly before it hits the bottom
-    });
-
-    document.querySelectorAll('.song-item').forEach(el => observer.observe(el));
 }
 
-
 // ══════════════════════════════════════════════
-//   MAGNETIC HOVER (song rows lean toward cursor)
+//   MAGNETIC HOVER
 // ══════════════════════════════════════════════
 function setupMagneticHover() {
     document.addEventListener('mousemove', e => {
@@ -438,10 +414,9 @@ function setupMagneticHover() {
             const dx   = e.clientX - cx;
             const dy   = e.clientY - cy;
             const dist = Math.sqrt(dx*dx + dy*dy);
-            const reach = 90;
-
+            const reach = 80;
             if (dist < reach) {
-                const strength = (1 - dist / reach) * 5;
+                const strength = (1 - dist / reach) * 4;
                 el.style.transform = `translate(${(dx/dist)*strength}px, ${(dy/dist)*strength}px)`;
             } else {
                 el.style.transform = '';
@@ -451,33 +426,29 @@ function setupMagneticHover() {
 }
 
 // ══════════════════════════════════════════════
-//   DRIFT-IN ENTRANCE (elements fly from edges)
+//   DRIFT-IN ENTRANCE
 // ══════════════════════════════════════════════
 function triggerEntrance() {
-    const delays = {
-        brand:       100,
-        moodPill:    280,
-        playerCard:  460,
-        mainContent: 600
-    };
-    Object.entries(delays).forEach(([id, delay]) => {
+    const items = [
+        { id: 'brand',       delay: 80  },
+        { id: 'moodPill',    delay: 260 },
+        { id: 'playerCard',  delay: 420 },
+        { id: 'mainContent', delay: 560 },
+    ];
+    items.forEach(({ id, delay }) => {
         const el = document.getElementById(id);
-        if (!el) return;
-        setTimeout(() => el.classList.add('arrived'), delay);
+        if (el) setTimeout(() => el.classList.add('arrived'), delay);
     });
-    // Footer
-    setTimeout(() => {
-        document.querySelector('.footer')?.classList.add('arrived');
-    }, 700);
+    setTimeout(() => document.querySelector('.footer')?.classList.add('arrived'), 640);
 }
 
 // ══════════════════════════════════════════════
-//   EVENT LISTENERS
+//   EVENTS
 // ══════════════════════════════════════════════
 function setupEvents() {
-    playBtn.onclick  = togglePlay;
-    nextBtn.onclick  = playNext;
-    prevBtn.onclick  = playPrev;
+    playBtn.onclick = togglePlay;
+    nextBtn.onclick = playNext;
+    prevBtn.onclick = playPrev;
 
     audio.addEventListener('timeupdate', () => {
         if (!audio.duration) return;
@@ -510,9 +481,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupEvents();
     triggerEntrance();
 
-    // Load first track silently (no autoplay)
     loadTrack(0, false);
-    // Set initial title text without slide animation
     trackTitle.textContent  = globalPlaylist[0].title;
     trackArtist.textContent = globalPlaylist[0].artist;
 });
