@@ -233,7 +233,6 @@ function getPrevIdx() {
 //   PLAYER ENGINE
 // ══════════════════════════════════════════════
 let prevTrackIdx = null;
-
 function loadTrack(idx, autoplay=true) {
     const dir = (prevTrackIdx===null||idx>=prevTrackIdx) ? 'next' : 'prev';
     prevTrackIdx = idx; currentIdx = idx;
@@ -245,12 +244,10 @@ function loadTrack(idx, autoplay=true) {
     stickerEl.textContent = '◈';
     timeCur.textContent = timeTot.textContent = '0:00';
     
-    // NEW: Reset the progress bar when a new track loads
     progressBar.value = 0;
     progressBar.style.setProperty('--progress', '0%');
     
     updateHighlight(); 
-    autoScrollToActive();
     
     if (autoplay) {
         initAudio();
@@ -262,7 +259,6 @@ function loadTrack(idx, autoplay=true) {
         }).catch(e => console.log('Playback:',e));
     }
 }
-
 function animateTrackChange(track, dir) {
     const ex = dir==='next'?'exit-left':'exit-right';
     const en = dir==='next'?'enter-left':'enter-right';
@@ -297,15 +293,6 @@ function updateHighlight() {
     const t=globalPlaylist[currentIdx];
     document.querySelector(`.song-item[data-cat="${t.category}"][data-idx="${t.localIndex}"]`)?.classList.add('active');
 }
-function autoScrollToActive() {
-    const t=globalPlaylist[currentIdx];
-    setTimeout(()=>{
-        document.querySelector(`.song-item[data-cat="${t.category}"][data-idx="${t.localIndex}"]`)
-            ?.scrollIntoView({ behavior:'smooth', block:'nearest' });
-    },300);
-}
-
-
 // ══════════════════════════════════════════════
 //   RENDER PLAYLISTS
 // ══════════════════════════════════════════════
@@ -413,9 +400,7 @@ audio.addEventListener('loadedmetadata', () => {
     timeTot.textContent = fmt(audio.duration);
 });
 
-// 2. As the track plays, update the current time and the progress bar
-audio.addEventListener('timeupdate', () => {
-    // Update time and the glow bar as the song plays
+// 2. Update time and the glow bar as the song plays
 audio.addEventListener('timeupdate', () => {
     if (!audio.duration) return;
     
@@ -431,29 +416,15 @@ audio.addEventListener('timeupdate', () => {
     progressBar.style.setProperty('--progress', `${progressPercent}%`);
 });
 
-// Let the user drag the slider to seek through the song
+// 3. Let the user drag the slider to seek through the song
 progressBar.addEventListener('input', (e) => {
     if (audio.duration) {
         audio.currentTime = (e.target.value / 100) * audio.duration;
     }
 });
-    
-    // Prevent errors if the duration isn't loaded yet
-    if (!audio.duration) return;
-    
-    // Update the "0:00" text for current time
-    timeCur.textContent = fmt(audio.currentTime);
-    
-    // Calculate the percentage of the song played (between 0.0 and 1.0)
-    const progress = audio.currentTime / audio.duration;
-    
-    // Animate the waveform or the fallback progress bar
-    drawWaveform(progress);
-});
 
-// 3. When the track finishes, figure out what to do next
+// 4. When the track finishes, figure out what to do next
 audio.addEventListener('ended', () => {
-    // If "Repeat One" is active, start over. Otherwise, play the next track.
     if (repeatMode === 2) { 
         audio.currentTime = 0;
         audio.play();
@@ -461,7 +432,6 @@ audio.addEventListener('ended', () => {
         playNext();
     }
 });
-
 // ══════════════════════
 // ══════════════════════════════════════════════
 //   APP INITIALIZATION
