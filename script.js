@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════
-//   SARGAM — ENGINE v6.0 (LIVE API EDITION)
+//   SARGAM — ENGINE v6.0 (APPLE MUSIC API EDITION)
 // ═══════════════════════════════════════════════
 
 // ── 1. PLAYLIST DATA (Now Dynamic!) ───────────
@@ -51,13 +51,13 @@ const nebCtx     = nebCanvas.getContext('2d');
 const moodWash   = document.getElementById('moodWash');
 const playerCard = document.getElementById('playerCard');
 const progressBar = document.getElementById('progressBar');
+
 // ══════════════════════════════════════════════
-//   APPLE MUSIC LIVE API FETCHER (100% Reliable)
+//   APPLE MUSIC LIVE API FETCHER
 // ══════════════════════════════════════════════
 async function loadLiveMusic() {
     moodLabel.textContent = "Connecting to Apple Music...";
 
-    // Feel free to change these to any artists in the world!
     const queries = {
         Bollywood: "Arijit Singh",
         Punjabi: "Diljit Dosanjh",
@@ -68,25 +68,21 @@ async function loadLiveMusic() {
 
     for (const cat of Object.keys(queries)) {
         try {
-            // Fetching from Apple's official, lightning-fast public API
             const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(queries[cat])}&entity=song&limit=5`);
             const json = await res.json();
             
             if (json && json.results && json.results.length > 0) {
                 playlistData[cat] = json.results.map((song) => {
-                    
-                    // Apple gives 100x100 images by default. We do a quick string replace to demand crisp 500x500 covers!
                     const highResImage = song.artworkUrl100 ? song.artworkUrl100.replace('100x100bb', '500x500bb') : '';
-
                     return {
                         title: song.trackName || 'Unknown Title',
                         artist: song.artistName || 'Unknown Artist',
-                        url: song.previewUrl, // 30-second ultra-high quality preview
+                        url: song.previewUrl,
                         image: highResImage,
-                        duration: 30, // Previews are exactly 30 seconds
+                        duration: 30, 
                         category: cat
                     };
-                }).filter(t => t.url); // Remove any broken tracks without audio
+                }).filter(t => t.url);
                 
                 if (playlistData[cat].length > 0) {
                     successCount++;
@@ -102,24 +98,6 @@ async function loadLiveMusic() {
         return;
     }
 
-    // Rebuild the global playlist dynamically
-    globalPlaylist = [];
-    Object.keys(playlistData).forEach(cat => {
-        playlistData[cat].forEach((track, i) => {
-            track.localIndex = i; 
-            globalPlaylist.push(track);
-        });
-    });
-}
-
-
-    // Fallback just in case the API goes down
-    if (successCount === 0) {
-        alert("API Offline. Please try again later.");
-        return;
-    }
-
-    // Rebuild the global playlist dynamically
     globalPlaylist = [];
     Object.keys(playlistData).forEach(cat => {
         playlistData[cat].forEach((track, i) => {
@@ -316,7 +294,6 @@ function loadTrack(idx, autoplay=true) {
     animateTrackChange(track, dir);
     stickerEl.textContent = '◈';
     
-    // Uses the new API duration!
     timeTot.textContent = fmt(track.duration);
     timeCur.textContent = '0:00';
     
@@ -378,7 +355,7 @@ function updateHighlight() {
 //   RENDER PLAYLISTS
 // ══════════════════════════════════════════════
 function renderPlaylists() {
-    catKeys = Object.keys(playlistData);
+    const catKeys = Object.keys(playlistData);
     catKeys.forEach(cat=>{
         const container=document.getElementById(`playlist-${cat}`);
         const countEl=document.getElementById(`count-${cat}`);
@@ -529,7 +506,7 @@ function loadState() {
 }
 
 // ══════════════════════════════════════════════
-//   MEDIA SESSION API (Now Uses Real Album Art!)
+//   MEDIA SESSION API
 // ══════════════════════════════════════════════
 function setupMediaSession() {
     if ('mediaSession' in navigator) {
@@ -553,21 +530,20 @@ function updateMediaSession(track) {
     }
 }
 
+
+
 // ══════════════════════════════════════════════
-//   APP INITIALIZATION (Async to wait for API)
+//   APP INITIALIZATION
 // ══════════════════════════════════════════════
 async function initApp() {
-    // 1. Fetch real music from JioSaavn first!
     await loadLiveMusic();
     
-    // 2. Load memory and render
     loadState();
     renderPlaylists();
     resizeNebula();
     drawNebula();
-    drawViz(); 
+    drawViz();
 
-    // 3. Connect controls
     setupKeyboard();
     setupSwipe();
     setupMagneticHover();
@@ -580,7 +556,6 @@ async function initApp() {
     repeatBtn.addEventListener('click', toggleRepeat);
     window.addEventListener('resize', resizeNebula);
 
-    // 4. Start the player safely
     if (globalPlaylist.length > 0) {
         if (currentIdx >= globalPlaylist.length) currentIdx = 0; 
         loadTrack(currentIdx, false); 
