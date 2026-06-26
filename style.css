@@ -65,8 +65,6 @@ body {
     font-family: var(--fb);
     background: var(--void);
     color: var(--txt);
-    overflow-x: hidden;
-    min-height: 100vh;
 }
 
 /* ── MOOD WASH ── */
@@ -97,6 +95,7 @@ body {
 .app-shell {
     position: relative;
     z-index: 10;
+   min-height: 100vh;
 }
 
 /* ── ENTRANCE ── */
