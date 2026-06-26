@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SARGAM</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <audio id="mainAudio" crossorigin="anonymous"></audio>
+    <canvas id="nebulaCanvas"></canvas>
+
+    <div id="appShell" class="app-shell">
+
+        <!-- ── HERO ── -->
+        <header class="hero">
+
+            <div class="brand drift-top" id="brand">
+                <div class="brand-eyebrow">private player</div>
+                <h1 class="brand-title">SARGAM</h1>
+                <div class="brand-rule"></div>
+            </div>
+
+            <div class="mood-pill drift-left" id="moodPill">
+                <span class="mood-dot" id="moodDot"></span>
+                <span id="moodLabel">Initialising</span>
+            </div>
+
+            <div class="player-card drift-right float-idle" id="playerCard">
+
+                <div class="beat-ring" id="beatRing"></div>
+
+                <div class="disc-stage">
+                    <canvas id="vizCanvas"></canvas>
+                    <div class="vinyl" id="vinylDisk">
+                        <div class="vinyl-groove vinyl-groove-1"></div>
+                        <div class="vinyl-groove vinyl-groove-2"></div>
+                        <div class="vinyl-groove vinyl-groove-3"></div>
+                        <div class="vinyl-center" id="stickerEmoji">◈</div>
+                    </div>
+                </div>
+
+                <div class="track-info-wrap">
+                    <div class="track-info" id="trackInfo">
+                        <div class="track-title" id="playerTitle">No Song Playing</div>
+                        <div class="track-artist" id="playerArtist">Select a track below</div>
+                    </div>
+                </div>
+
+                <div class="timeline-wrap">
+                    <div class="timeline" id="timelineContainer">
+                        <div class="timeline-fill" id="timelineFilled"></div>
+                        <div class="timeline-thumb" id="timelineThumb"></div>
+                    </div>
+                    <div class="timestamps">
+                        <span id="timeCurrent">0:00</span>
+                        <span id="timeTotal">0:00</span>
+                    </div>
+                </div>
+
+                <div class="controls">
+                    <button class="ctrl-btn" id="prevBtn" aria-label="Previous">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg>
+                    </button>
+                    <button class="ctrl-btn ctrl-play" id="playButton" aria-label="Play">
+                        <svg id="playIcon" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                        <svg id="pauseIcon" viewBox="0 0 24 24" fill="currentColor" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                    </button>
+                    <button class="ctrl-btn" id="nextBtn" aria-label="Next">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zm2-8.14 5.17 2.14L8 14.14V9.86zM16 6h2v12h-2z"/></svg>
+                    </button>
+                </div>
+
+            </div>
+
+        </header>
+
+        <!-- ── PLAYLIST ── -->
+        <main class="main drift-bottom" id="mainContent">
+
+            <section class="pl-section">
+                <div class="pl-header">
+                    <h2 class="pl-title">Bollywood</h2>
+                    <span class="pl-script">ਬਾਲੀਵੁੱਡ</span>
+                    <span class="pl-count" id="count-Bollywood"></span>
+                </div>
+                <div class="pl-grid" id="playlist-Bollywood"></div>
+            </section>
+
+            <section class="pl-section">
+                <div class="pl-header">
+                    <h2 class="pl-title">Punjabi</h2>
+                    <span class="pl-script">ਪੰਜਾਬੀ</span>
+                    <span class="pl-count" id="count-Punjabi"></span>
+                </div>
+                <div class="pl-grid" id="playlist-Punjabi"></div>
+            </section>
+
+            <section class="pl-section">
+                <div class="pl-header">
+                    <h2 class="pl-title">English</h2>
+                    <span class="pl-script">ਅੰਗਰੇਜ਼ੀ</span>
+                    <span class="pl-count" id="count-English"></span>
+                </div>
+                <div class="pl-grid" id="playlist-English"></div>
+            </section>
+
+        </main>
+
+        <footer class="footer drift-bottom">
+            <div class="footer-rule"></div>
+            <p class="footer-name">SARGAM</p>
+            <p class="footer-tagline">by Evaan</p>
+        </footer>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
