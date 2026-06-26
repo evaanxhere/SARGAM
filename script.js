@@ -56,7 +56,6 @@ const stickerEl  = document.getElementById('stickerEmoji');
 const trackTitle = document.getElementById('playerTitle');
 const trackArtist= document.getElementById('playerArtist');
 const trackInfo  = document.getElementById('trackInfo');
-
 const timeCur    = document.getElementById('timeCurrent');
 const timeTot    = document.getElementById('timeTotal');
 const prevBtn    = document.getElementById('prevBtn');
@@ -71,7 +70,6 @@ const nebCanvas  = document.getElementById('nebulaCanvas');
 const nebCtx     = nebCanvas.getContext('2d');
 const moodWash   = document.getElementById('moodWash');
 const playerCard = document.getElementById('playerCard');
-
 const progressBar = document.getElementById('progressBar');
 
 
@@ -85,8 +83,8 @@ function resizeNebula() {
     nebCanvas.width  = window.innerWidth;
     nebCanvas.height = window.innerHeight;
     buildScene();
-    setupWaveCanvas();
 }
+
 
 function buildScene() {
     inkBlobs.length = stars.length = 0;
@@ -240,19 +238,28 @@ function loadTrack(idx, autoplay=true) {
     const dir = (prevTrackIdx===null||idx>=prevTrackIdx) ? 'next' : 'prev';
     prevTrackIdx = idx; currentIdx = idx;
     const track = globalPlaylist[idx];
+    
     audio.src = track.url;
     setMood(track.category);
     animateTrackChange(track, dir);
     stickerEl.textContent = '◈';
     timeCur.textContent = timeTot.textContent = '0:00';
+    
+    // NEW: Reset the progress bar when a new track loads
     progressBar.value = 0;
-progressBar.style.setProperty('--progress', '0%');
+    progressBar.style.setProperty('--progress', '0%');
+    
+    updateHighlight(); 
+    autoScrollToActive();
     
     if (autoplay) {
         initAudio();
         if (audioCtx.state==='suspended') audioCtx.resume();
-        audio.play().then(()=>{ isPlaying=true; setPlayVisuals(true); updateHighlight(); })
-            .catch(e=>console.log('Playback:',e));
+        audio.play().then(() => { 
+            isPlaying=true; 
+            setPlayVisuals(true); 
+            updateHighlight(); 
+        }).catch(e => console.log('Playback:',e));
     }
 }
 
