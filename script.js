@@ -565,6 +565,21 @@ function updateMediaSession(track) {
 }
 
 
+// ══════════════════════════════════════════════
+//   PREMIUM SMOOTH SCROLLING (Lenis)
+// ══════════════════════════════════════════════
+const lenis = new Lenis({
+    duration: 1.2,       // How long the glide lasts
+    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // Premium physics curve
+    smooth: true,
+    mouseMultiplier: 1.1 // Makes the mouse wheel feel slightly heavier/richer
+});
+
+function raf(time) {
+    lenis.raf(time);
+    requestAnimationFrame(raf);
+}
+requestAnimationFrame(raf);
 
 // ══════════════════════════════════════════════
 //   APP INITIALIZATION
@@ -577,6 +592,8 @@ async function initApp() {
     resizeNebula();
     drawNebula();
     drawViz();
+        gsap.registerPlugin(ScrollTrigger);
+    
 
     setupKeyboard();
     setupSwipe();
