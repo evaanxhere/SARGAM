@@ -6,127 +6,159 @@
     <title>SARGAM</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.0/color-thief.umd.js"></script>
-        <!-- GSAP & ScrollTrigger (Animation Physics) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-    
-    <!-- Lenis (Smooth Buttery Scrolling) -->
-    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js"></script>
-    
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <audio id="mainAudio" crossorigin="anonymous"></audio>
-    <div id="moodWash" class="mood-wash"></div>
-    <canvas id="nebulaCanvas"></canvas>
+    <canvas id="grainCanvas"></canvas>
 
-    <div id="appShell" class="app-shell">
+    <div class="page">
 
-        <header class="hero">
-
-            <div class="brand drift-top" id="brand">
-                <div class="brand-eyebrow">private player</div>
-                <h1 class="brand-title">SARGAM</h1>
-                <div class="brand-rule"></div>
+        <header class="masthead">
+            <div class="masthead-left">
+                <span class="masthead-issue">Vol. I</span>
+                <span class="masthead-sep">·</span>
+                <span class="masthead-cat" id="mastCat">—</span>
             </div>
-
-            <div class="mood-pill drift-left" id="moodPill">
-                <span class="mood-dot" id="moodDot"></span>
-                <span id="moodLabel">Initialising</span>
+            <h1 class="masthead-title">SARGAM</h1>
+            <div class="masthead-right">
+                <span class="masthead-label" id="mastLabel">Private Player</span>
             </div>
-
-            <div class="player-card drift-right float-idle" id="playerCard">
-
-                <div class="beat-ring" id="beatRing"></div>
-
-                <div class="disc-stage">
-                    <canvas id="vizCanvas"></canvas>
-                    <div class="vinyl" id="vinylDisk">
-                        <div class="vinyl-groove vinyl-groove-1"></div>
-                        <div class="vinyl-groove vinyl-groove-2"></div>
-                        <div class="vinyl-groove vinyl-groove-3"></div>
-                        <div class="vinyl-center" id="stickerEmoji">◈</div>
-                    </div>
-                </div>
-
-                <div class="track-info-wrap">
-                    <div class="track-info" id="trackInfo">
-                        <div class="track-title" id="playerTitle">No Song Playing</div>
-                        <div class="track-artist" id="playerArtist">Select a track below</div>
-                    </div>
-                </div>
-
-                <div class="waveform-wrap">
-                    <input type="range" id="progressBar" class="glow-bar" min="0" max="100" value="0" step="0.1" aria-label="Seek progress">
-                    <div class="timestamps">
-                        <span id="timeCurrent">0:00</span>
-                        <span id="timeTotal">0:00</span>
-                    </div>
-                </div>
-
-                <div class="controls">
-                    <button class="ctrl-btn ctrl-small" id="shuffleBtn" aria-label="Shuffle" title="Shuffle">
-                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17zm4.76-.82l3.65 3.65-3.65 3.65V14h-1.76c-.91 0-1.75-.36-2.37-.95L9.65 11.5l1.41-1.41 1.43 1.43c.32.32.76.48 1.21.48H15.35zm0 8.33V15h-1.76c-1.52 0-2.94-.59-4.01-1.67l-3.94-3.95-1.42 1.42 3.95 3.95C9.22 16.21 11.13 17 13.17 17H15.35v1.68l4.24-4.24-4.24-4.24z"/></svg>
-                    </button>
-                    <button class="ctrl-btn" id="prevBtn" aria-label="Previous">
-                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg>
-                    </button>
-                    <button class="ctrl-btn ctrl-play" id="playButton" aria-label="Play">
-                        <svg id="playIcon" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-                        <svg id="pauseIcon" viewBox="0 0 24 24" fill="currentColor" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-                    </button>
-                    <button class="ctrl-btn" id="nextBtn" aria-label="Next">
-                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zm2-8.14 5.17 2.14L8 14.14V9.86zM16 6h2v12h-2z"/></svg>
-                    </button>
-                    <button class="ctrl-btn ctrl-small" id="repeatBtn" aria-label="Repeat" title="Repeat off">
-                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 7h10v3l4-4-4-4v3H5v6h2zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2z"/></svg>
-                    </button>
-                </div>
-
-            </div>
-
         </header>
 
-        <main class="main drift-bottom" id="mainContent">
+        <div class="masthead-rule"></div>
 
-            <section class="pl-section">
-                <div class="pl-header">
-                    <h2 class="pl-title">Bollywood</h2>
-                    <span class="pl-script">ਬਾਲੀਵੁੱਡ</span>
-                    <span class="pl-count" id="count-Bollywood"></span>
+        <div class="content-grid">
+
+            <div class="player-column">
+
+                <div class="cassette" id="cassette">
+                    <div class="cassette-body">
+
+                        <div class="cassette-brand">
+                            <span class="cb-label">SARGAM</span>
+                            <span class="cb-type">TYPE II · HX-PRO</span>
+                        </div>
+
+                        <div class="cassette-window">
+                            <div class="window-inner">
+                                <div class="reel reel-left" id="reelLeft">
+                                    <div class="reel-hub">
+                                        <div class="reel-spoke"></div>
+                                        <div class="reel-spoke"></div>
+                                        <div class="reel-spoke"></div>
+                                    </div>
+                                </div>
+                                <div class="tape-bridge">
+                                    <canvas id="vizCanvas" width="60" height="18"></canvas>
+                                </div>
+                                <div class="reel reel-right" id="reelRight">
+                                    <div class="reel-hub">
+                                        <div class="reel-spoke"></div>
+                                        <div class="reel-spoke"></div>
+                                        <div class="reel-spoke"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="cassette-info">
+                            <div class="ci-tracknum" id="ciNum">01</div>
+                            <div class="ci-text">
+                                <div class="ci-title" id="ciTitle">Select a track</div>
+                                <div class="ci-artist" id="ciArtist">—</div>
+                            </div>
+                        </div>
+
+                        <div class="cassette-wave">
+                            <canvas id="waveCanvas"></canvas>
+                            <div class="wave-times">
+                                <span id="timeCur">0:00</span>
+                                <span id="timeTot">0:00</span>
+                            </div>
+                        </div>
+
+                        <div class="cassette-controls">
+                            <button class="cc-btn" id="shuffleBtn" title="Shuffle">
+                                <svg viewBox="0 0 24 24"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17zm4.76-.82l3.65 3.65-3.65 3.65V14h-1.76c-.91 0-1.75-.36-2.37-.95L9.65 11.5l1.41-1.41 1.43 1.43c.32.32.76.48 1.21.48H15.35zm0 8.33V15h-1.76c-1.52 0-2.94-.59-4.01-1.67l-3.94-3.95-1.42 1.42 3.95 3.95C9.22 16.21 11.13 17 13.17 17H15.35v1.68l4.24-4.24-4.24-4.24z"/></svg>
+                            </button>
+                            <button class="cc-btn cc-prev" id="prevBtn" title="Previous">
+                                <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg>
+                            </button>
+                            <button class="cc-btn cc-play" id="playBtn">
+                                <svg id="playIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                <svg id="pauseIcon" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                            </button>
+                            <button class="cc-btn cc-next" id="nextBtn" title="Next">
+                                <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zm2-8.14 5.17 2.14L8 14.14V9.86zM16 6h2v12h-2z"/></svg>
+                            </button>
+                            <button class="cc-btn" id="repeatBtn" title="Repeat">
+                                <svg id="repeatIcon" viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2z"/></svg>
+                            </button>
+                        </div>
+
+                        <div class="cassette-holes">
+                            <span class="ch"></span>
+                            <span class="ch"></span>
+                            <span class="ch"></span>
+                            <span class="ch"></span>
+                            <span class="ch"></span>
+                        </div>
+
+                    </div>
                 </div>
-                <div class="pl-grid" id="playlist-Bollywood"></div>
-            </section>
 
-            <section class="pl-section">
-                <div class="pl-header">
-                    <h2 class="pl-title">Punjabi</h2>
-                    <span class="pl-script">ਪੰਜਾਬੀ</span>
-                    <span class="pl-count" id="count-Punjabi"></span>
+                <div class="mood-tag">
+                    <span class="mt-dot" id="mtDot"></span>
+                    <span class="mt-label" id="mtLabel">—</span>
                 </div>
-                <div class="pl-grid" id="playlist-Punjabi"></div>
-            </section>
 
-            <section class="pl-section">
-                <div class="pl-header">
-                    <h2 class="pl-title">English</h2>
-                    <span class="pl-script">ਅੰਗਰੇਜ਼ੀ</span>
-                    <span class="pl-count" id="count-English"></span>
+                <div class="kb-hint">
+                    <span>space</span> play · <span>←→</span> skip · <span>S</span> shuffle · <span>R</span> repeat
                 </div>
-                <div class="pl-grid" id="playlist-English"></div>
-            </section>
 
-        </main>
+            </div>
 
-        <footer class="footer drift-bottom">
-            <div class="footer-rule"></div>
-            <p class="footer-name">SARGAM</p>
-            <p class="footer-tagline">by Evaan</p>
+            <div class="tracklist-column">
+
+                <div class="tl-section">
+                    <div class="tl-heading">
+                        <span class="tl-cat">Bollywood</span>
+                        <span class="tl-script">ਬਾਲੀਵੁੱਡ</span>
+                        <span class="tl-rule"></span>
+                        <span class="tl-count" id="cnt-Bollywood"></span>
+                    </div>
+                    <div class="tl-grid" id="playlist-Bollywood"></div>
+                </div>
+
+                <div class="tl-section">
+                    <div class="tl-heading">
+                        <span class="tl-cat">Punjabi</span>
+                        <span class="tl-script">ਪੰਜਾਬੀ</span>
+                        <span class="tl-rule"></span>
+                        <span class="tl-count" id="cnt-Punjabi"></span>
+                    </div>
+                    <div class="tl-grid" id="playlist-Punjabi"></div>
+                </div>
+
+                <div class="tl-section">
+                    <div class="tl-heading">
+                        <span class="tl-cat">English</span>
+                        <span class="tl-script">ਅੰਗਰੇਜ਼ੀ</span>
+                        <span class="tl-rule"></span>
+                        <span class="tl-count" id="cnt-English"></span>
+                    </div>
+                    <div class="tl-grid" id="playlist-English"></div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <footer class="page-footer">
+            <span>SARGAM · Private Listening · by Evaan</span>
         </footer>
 
     </div>
