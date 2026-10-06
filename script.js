@@ -1,345 +1,314 @@
 // ═══════════════════════════════════════════════
-//   SARGAM v6 — Cassette Editorial Engine
+//   SARGAM v7 — simple, reliable player engine
+//   To add a song: add one line in LIBRARY below.
 // ═══════════════════════════════════════════════
+(() => {
+    'use strict';
 
-const playlistData = {
-    Bollywood: [
-        { title: "Fitoor",          artist: "Arijit Singh",      url: "music/bgmusic.mp3"  },
-        { title: "Saat Samundar",   artist: "Sadhana Sargam",    url: "music/bgmusic2.mp3" },
-        { title: "Tum Ho",          artist: "Mohit Chauhan",     url: "music/bgmusic3.mp3" }
-    ],
-    Punjabi: [
-        { title: "Channa",          artist: "Gippy Grewal",      url: "music/bgmusic4.mp3" },
-        { title: "Maar Sutiya",     artist: "Amrinder Gill",     url: "music/bgmusic5.mp3" }
-    ],
-    English: [
-        { title: "Espresso",        artist: "Sabrina Carpenter", url: "music/bgmusic6.mp3" },
-        { title: "Blinding Lights", artist: "The Weeknd",        url: "music/bgmusic7.mp3" }
-    ]
-};
+    // ── 1. YOUR MUSIC ─────────────────────────────
+    const LIBRARY = {
+        Bollywood: [
+            { title: "Fitoor",          artist: "Arijit Singh",      url: "music/bgmusic.mp3"  },
+            { title: "Saat Samundar",   artist: "Sadhana Sargam",    url: "music/bgmusic2.mp3" },
+            { title: "Tum Ho",          artist: "Mohit Chauhan",     url: "music/bgmusic3.mp3" }
+        ],
+        Punjabi: [
+            { title: "Channa",          artist: "Gippy Grewal",      url: "music/bgmusic4.mp3" },
+            { title: "Maar Sutiya",     artist: "Amrinder Gill",     url: "music/bgmusic5.mp3" }
+        ],
+        English: [
+            { title: "Espresso",        artist: "Sabrina Carpenter", url: "music/bgmusic6.mp3" },
+            { title: "Blinding Lights", artist: "The Weeknd",        url: "music/bgmusic7.mp3" }
+        ]
+    };
 
-const moodConfig = {
-    Bollywood: { label: "ਬਾਲੀਵੁੱਡ", cls: "mood-Bollywood", accent: "#c49a2a" },
-    Punjabi:   { label: "ਪੰਜਾਬੀ",   cls: "mood-Punjabi",   accent: "#c43a9a" },
-    English:   { label: "ਅੰਗਰੇਜ਼ੀ",   cls: "mood-English",   accent: "#2a7ab0" }
-};
+    const SCRIPT_NAMES = {
+        Bollywood: 'ਬਾਲੀਵੁੱਡ',
+        Punjabi:   'ਪੰਜਾਬੀ',
+        English:   'ਅੰਗਰੇਜ਼ੀ'
+    };
 
-const globalPlaylist = [];
-const catKeys = Object.keys(playlistData);
-catKeys.forEach(cat => {
-    playlistData[cat].forEach((track, i) => {
-        globalPlaylist.push({ ...track, category: cat, localIndex: i });
+    // ── 2. FLAT TRACK LIST ────────────────────────
+    const tracks = [];
+    Object.entries(LIBRARY).forEach(([cat, songs]) => {
+        songs.forEach((song, n) => tracks.push({ ...song, cat, n }));
     });
-});
 
-let currentIdx  = 0, isPlaying = false, isShuffle = false, repeatMode = 0;
-let audioCtx = null, analyser = null, waveData = null;
-let currentAccent = "#c49a2a";
+    // ── 3. DOM ────────────────────────────────────
+    const $ = id => document.getElementById(id);
+    const audio     = $('audio');
+    const titleEl   = $('title');
+    const artistEl  = $('artist');
+    const curEl     = $('cur');
+    const durEl     = $('dur');
+    const seek      = $('seek');
+    const playBtn   = $('playBtn');
+    const prevBtn   = $('prevBtn');
+    const nextBtn   = $('nextBtn');
+    const shuffleBtn= $('shuffleBtn');
+    const repeatBtn = $('repeatBtn');
 
-const audio      = document.getElementById('mainAudio');
-const playBtn    = document.getElementById('playBtn');
-const playIcon   = document.getElementById('playIcon');
-const pauseIcon  = document.getElementById('pauseIcon');
-const prevBtn    = document.getElementById('prevBtn');
-const nextBtn    = document.getElementById('nextBtn');
-const shuffleBtn = document.getElementById('shuffleBtn');
-const repeatBtn  = document.getElementById('repeatBtn');
-const reelL      = document.getElementById('reelLeft');
-const reelR      = document.getElementById('reelRight');
-const ciNum      = document.getElementById('ciNum');
-const ciTitle    = document.getElementById('ciTitle');
-const ciArtist   = document.getElementById('ciArtist');
-const mastCat    = document.getElementById('mastCat');
-const mtLabel    = document.getElementById('mtLabel');
-const mtDot      = document.getElementById('mtDot');
-const timeCur    = document.getElementById('timeCur');
-const timeTot    = document.getElementById('timeTot');
-const vizCanvas  = document.getElementById('vizCanvas');
-const vizCtx     = vizCanvas.getContext('2d');
-const waveCanvas = document.getElementById('waveCanvas');
-const waveCtx    = waveCanvas.getContext('2d');
-const grainCanvas= document.getElementById('grainCanvas');
-const grainCtx   = grainCanvas.getContext('2d');
+    // ── 4. STATE ──────────────────────────────────
+    let current = 0;
+    let shuffle = false;
+    let repeat  = 0;          // 0 off · 1 all · 2 one
+    let seeking = false;
+    const history = [];       // for "previous" while shuffling
+    const rows = [];          // DOM row for each track index
 
-// ── GRAIN ────────────────────────────────────
-function setupGrain() {
-    grainCanvas.width = window.innerWidth;
-    grainCanvas.height = window.innerHeight;
-}
-setInterval(() => {
-    const W = grainCanvas.width, H = grainCanvas.height;
-    const d = grainCtx.createImageData(W, H);
-    for (let i = 0; i < d.data.length; i += 4) {
-        const v = Math.random() * 255;
-        d.data[i] = d.data[i+1] = d.data[i+2] = v; d.data[i+3] = 255;
-    }
-    grainCtx.putImageData(d, 0, 0);
-}, 80);
+    // ── 5. HELPERS ────────────────────────────────
+    const fmt = s => {
+        if (!isFinite(s) || isNaN(s)) return '0:00';
+        return Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart(2, '0');
+    };
+    const setFill = pct => seek.style.setProperty('--p', pct + '%');
 
-// ── WAVEFORM ─────────────────────────────────
-function setupWaveCanvas() {
-    const dpr = window.devicePixelRatio || 1, w = waveCanvas.offsetWidth || 240;
-    waveCanvas.width = w * dpr; waveCanvas.height = 32 * dpr;
-    waveCtx.scale(dpr, dpr);
-    waveCanvas.style.width = w + 'px'; waveCanvas.style.height = '32px';
-}
+    // ── 6. BUILD THE TRACKLIST ────────────────────
+    function buildLibrary() {
+        const lib = $('library');
+        let rowCount = 0;
 
-async function loadWaveform(url) {
-    waveData = null; drawWave(0);
-    try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        const buf = await (await fetch(url)).arrayBuffer();
-        const dec = await ctx.decodeAudioData(buf); ctx.close();
-        const raw = dec.getChannelData(0), peaks = 180, chunk = Math.floor(raw.length / peaks);
-        waveData = new Float32Array(peaks);
-        for (let i = 0; i < peaks; i++) {
-            let mx = 0;
-            for (let j = 0; j < chunk; j++) { const v = Math.abs(raw[i*chunk+j]); if (v > mx) mx = v; }
-            waveData[i] = mx;
-        }
-        drawWave(audio.currentTime / (audio.duration || 1));
-    } catch(e) { drawWave(0); }
-}
+        Object.entries(LIBRARY).forEach(([cat, songs]) => {
+            const section = document.createElement('section');
+            section.className = 'shelf';
+            section.dataset.cat = cat;
+            section.innerHTML = `
+                <header class="shelf-head">
+                    <h2>${cat}</h2>
+                    <span class="script">${SCRIPT_NAMES[cat] || ''}</span>
+                    <span class="leader"></span>
+                    <span class="count">${songs.length} ${songs.length === 1 ? 'track' : 'tracks'}</span>
+                </header>
+                <ol class="tracks"></ol>`;
+            const list = section.querySelector('.tracks');
 
-function drawWave(progress) {
-    const w = waveCanvas.offsetWidth || 240, h = 32, dpr = window.devicePixelRatio || 1;
-    waveCtx.clearRect(0, 0, w * dpr, h * dpr);
-    if (!waveData) {
-        const mid = h / 2;
-        waveCtx.fillStyle = 'rgba(255,255,255,0.08)';
-        waveCtx.fillRect(0, mid-1, w, 2);
-        if (progress > 0) {
-            waveCtx.fillStyle = currentAccent;
-            waveCtx.fillRect(0, mid-1, w*progress, 2);
-            waveCtx.beginPath(); waveCtx.arc(w*progress, mid, 4, 0, Math.PI*2);
-            waveCtx.fill();
-        }
-        return;
-    }
-    const bars = waveData.length, barW = w / bars, mid = h / 2, cut = Math.floor(progress * bars);
-    for (let i = 0; i < bars; i++) {
-        const bh = Math.max(1.5, waveData[i] * h * 0.85), x = i * barW;
-        waveCtx.fillStyle = i < cut ? currentAccent : 'rgba(255,255,255,0.12)';
-        waveCtx.shadowColor = i < cut ? currentAccent : 'transparent';
-        waveCtx.shadowBlur  = i < cut ? 3 : 0;
-        waveCtx.beginPath(); waveCtx.roundRect(x, mid-bh/2, Math.max(1,barW-0.8), bh, 0.5); waveCtx.fill();
-    }
-    waveCtx.shadowBlur = 0;
-}
+            songs.forEach((song, n) => {
+                const idx = tracks.findIndex(t => t.cat === cat && t.n === n);
+                const li = document.createElement('li');
+                li.className = 'track';
+                li.style.setProperty('--i', rowCount++);
+                li.tabIndex = 0;
+                li.setAttribute('role', 'button');
+                li.setAttribute('aria-label', `Play ${song.title} by ${song.artist}`);
+                li.innerHTML = `
+                    <span class="t-num">${String(n + 1).padStart(2, '0')}</span>
+                    <span class="t-main">
+                        <span class="t-title">${song.title}</span>
+                        <span class="t-artist">${song.artist}</span>
+                    </span>
+                    <span class="t-side">
+                        <span class="eq" aria-hidden="true"><i></i><i></i><i></i></span>
+                        <span class="t-dur">–:––</span>
+                    </span>`;
+                li.addEventListener('click', () => pick(idx));
+                li.addEventListener('keydown', e => {
+                    if (e.key === 'Enter') { e.preventDefault(); pick(idx); }
+                });
+                list.appendChild(li);
+                rows[idx] = li;
+            });
 
-waveCanvas.addEventListener('click', e => {
-    if (!audio.duration) return;
-    const r = waveCanvas.getBoundingClientRect();
-    audio.currentTime = ((e.clientX - r.left) / r.width) * audio.duration;
-});
-
-// ── MINI VIZ ─────────────────────────────────
-function drawViz() {
-    requestAnimationFrame(drawViz);
-    vizCtx.clearRect(0, 0, 60, 18);
-    if (!analyser) {
-        vizCtx.fillStyle = 'rgba(255,255,255,0.06)';
-        vizCtx.fillRect(0, 8, 60, 2); return;
-    }
-    const freq = new Uint8Array(analyser.frequencyBinCount);
-    analyser.getByteFrequencyData(freq);
-    for (let i = 0; i < 20; i++) {
-        const v = freq[Math.floor(i * freq.length / 20)] / 255;
-        const bh = Math.max(1, v * 14);
-        vizCtx.fillStyle = currentAccent;
-        vizCtx.globalAlpha = 0.5 + v * 0.5;
-        vizCtx.fillRect(i * 3, 9 - bh/2, 2, bh);
-    }
-    vizCtx.globalAlpha = 1;
-}
-
-// ── MOOD ─────────────────────────────────────
-function setMood(category) {
-    const m = moodConfig[category]; if (!m) return;
-    currentAccent = m.accent;
-    Object.values(moodConfig).forEach(c => document.body.classList.remove(c.cls));
-    document.body.classList.add(m.cls);
-    mtLabel.textContent = m.label; mastCat.textContent = category;
-    mtDot.style.background = m.accent; mastCat.style.color = m.accent;
-}
-
-// ── WEB AUDIO ────────────────────────────────
-function initAudio() {
-    if (audioCtx) return;
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    analyser = audioCtx.createAnalyser(); analyser.fftSize = 128;
-    const src = audioCtx.createMediaElementSource(audio);
-    src.connect(analyser); analyser.connect(audioCtx.destination);
-}
-
-// ── SHUFFLE / REPEAT ─────────────────────────
-function getNext() {
-    if (repeatMode === 2) return currentIdx;
-    if (isShuffle) { let n; do { n = Math.floor(Math.random()*globalPlaylist.length); } while(n===currentIdx&&globalPlaylist.length>1); return n; }
-    return (currentIdx + 1) % globalPlaylist.length;
-}
-function getPrev() {
-    if (isShuffle) { let n; do { n = Math.floor(Math.random()*globalPlaylist.length); } while(n===currentIdx&&globalPlaylist.length>1); return n; }
-    return (currentIdx - 1 + globalPlaylist.length) % globalPlaylist.length;
-}
-
-// ── PLAYER ───────────────────────────────────
-function loadTrack(idx, autoplay = true) {
-    currentIdx = idx;
-    const t = globalPlaylist[idx];
-    audio.src = t.url; setMood(t.category);
-    animateInfo(t, idx);
-    timeCur.textContent = timeTot.textContent = '0:00';
-    waveData = null; drawWave(0); loadWaveform(t.url);
-    updateHighlight(); scrollToActive();
-    if (autoplay) {
-        initAudio();
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-        audio.play().then(() => { isPlaying = true; setPlayUI(true); updateHighlight(); }).catch(e => console.log(e));
-    }
-}
-
-function animateInfo(track, idx) {
-    ciTitle.style.opacity = ciArtist.style.opacity = ciNum.style.opacity = '0';
-    setTimeout(() => {
-        ciTitle.textContent = track.title;
-        ciArtist.textContent = track.artist.toUpperCase();
-        ciNum.textContent = String(idx + 1).padStart(2, '0');
-        ciTitle.style.transition = ciArtist.style.transition = ciNum.style.transition = 'opacity 0.4s ease';
-        ciTitle.style.opacity = ciArtist.style.opacity = ciNum.style.opacity = '1';
-    }, 140);
-}
-
-function togglePlay() {
-    initAudio();
-    if (audioCtx.state === 'suspended') audioCtx.resume();
-    if (isPlaying) { audio.pause(); isPlaying = false; setPlayUI(false); }
-    else { audio.play().then(() => { isPlaying = true; setPlayUI(true); }).catch(e => console.log(e)); }
-    updateHighlight();
-}
-
-function setPlayUI(p) {
-    playIcon.style.display = p ? 'none' : 'block';
-    pauseIcon.style.display = p ? 'block' : 'none';
-    p ? (reelL.classList.add('spinning'), reelR.classList.add('spinning'))
-      : (reelL.classList.remove('spinning'), reelR.classList.remove('spinning'));
-}
-
-function fmt(s) { return !isFinite(s)||isNaN(s)?'0:00':`${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`; }
-
-function updateHighlight() {
-    document.querySelectorAll('.song-row').forEach(el => el.classList.remove('active'));
-    const t = globalPlaylist[currentIdx];
-    document.querySelector(`.song-row[data-cat="${t.category}"][data-idx="${t.localIndex}"]`)?.classList.add('active');
-}
-
-function scrollToActive() {
-    const t = globalPlaylist[currentIdx];
-    setTimeout(() => {
-        document.querySelector(`.song-row[data-cat="${t.category}"][data-idx="${t.localIndex}"]`)
-            ?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }, 300);
-}
-
-// ── RENDER ───────────────────────────────────
-function renderPlaylists() {
-    catKeys.forEach(cat => {
-        const grid = document.getElementById(`playlist-${cat}`);
-        const count = document.getElementById(`cnt-${cat}`);
-        if (!grid) return;
-        const songs = playlistData[cat];
-        if (count) count.textContent = songs.length + ' tracks';
-        grid.innerHTML = '';
-        songs.forEach((song, i) => {
-            const gIdx = globalPlaylist.findIndex(t => t.category === cat && t.localIndex === i);
-            const row = document.createElement('div');
-            row.className = 'song-row'; row.dataset.cat = cat; row.dataset.idx = i;
-            row.onclick = () => loadTrack(gIdx, true);
-            row.innerHTML = `
-                <span class="sr-num">${String(i+1).padStart(2,'0')}</span>
-                <div class="sr-main">
-                    <div class="sr-title">${song.title}</div>
-                    <div class="sr-artist">${song.artist}</div>
-                </div>
-                <div class="sr-right">
-                    <span class="sr-dur" data-src="${song.url}">—:——</span>
-                    <span class="sr-wave"><span class="wb"></span><span class="wb"></span><span class="wb"></span></span>
-                </div>`;
-            grid.appendChild(row);
+            lib.appendChild(section);
         });
-    });
-    document.querySelectorAll('.sr-dur[data-src]').forEach(el => {
-        const tmp = new Audio(); tmp.preload = 'metadata'; tmp.src = el.dataset.src;
-        tmp.addEventListener('loadedmetadata', () => { el.textContent = fmt(tmp.duration); tmp.src = ''; });
-    });
-}
+    }
 
-// ── SHUFFLE / REPEAT UI ──────────────────────
-function toggleShuffle() { isShuffle = !isShuffle; shuffleBtn.classList.toggle('active', isShuffle); }
-function toggleRepeat() {
-    repeatMode = (repeatMode + 1) % 3;
-    repeatBtn.classList.toggle('active', repeatMode > 0);
-    repeatBtn.title = ['Repeat off','Repeat all','Repeat one'][repeatMode];
-    document.getElementById('repeatIcon').innerHTML = repeatMode === 2
-        ? '<path d="M7 7h10v3l4-4-4-4v3H5v6h2zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2zm-4-2V9h-1l-2 1v1h1.5v4z"/>'
-        : '<path d="M7 7h10v3l4-4-4-4v3H5v6h2zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2z"/>';
-}
+    // fetch each file's length quietly in the background
+    function loadDurations() {
+        tracks.forEach((t, i) => {
+            const probe = new Audio();
+            probe.preload = 'metadata';
+            probe.src = t.url;
+            probe.addEventListener('loadedmetadata', () => {
+                t.dur = probe.duration;
+                const el = rows[i] && rows[i].querySelector('.t-dur');
+                if (el) el.textContent = fmt(probe.duration);
+                probe.removeAttribute('src');
+                probe.load();
+            });
+        });
+    }
 
-// ── SWIPE ────────────────────────────────────
-function setupSwipe() {
-    const card = document.querySelector('.cassette'); let sx = null;
-    card.addEventListener('touchstart', e => { sx = e.touches[0].clientX; }, { passive: true });
-    card.addEventListener('touchend', e => {
-        if (sx === null) return;
-        const dx = e.changedTouches[0].clientX - sx;
-        if (Math.abs(dx) > 50) dx < 0 ? loadTrack(getNext()) : loadTrack(getPrev());
-        sx = null;
-    }, { passive: true });
-}
+    // ── 7. PLAYER ─────────────────────────────────
+    function loadTrack(idx, autoplay) {
+        current = idx;
+        const t = tracks[idx];
 
-// ── KEYBOARD ─────────────────────────────────
-function setupKeyboard() {
-    document.addEventListener('keydown', e => {
-        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-        switch(e.code) {
-            case 'Space': e.preventDefault(); togglePlay(); break;
-            case 'ArrowRight': e.preventDefault();
-                e.shiftKey ? (audio.currentTime = Math.min(audio.duration||0, audio.currentTime+10)) : loadTrack(getNext()); break;
-            case 'ArrowLeft': e.preventDefault();
-                e.shiftKey ? (audio.currentTime = Math.max(0, audio.currentTime-10)) : loadTrack(getPrev()); break;
-            case 'KeyS': toggleShuffle(); break;
-            case 'KeyR': toggleRepeat(); break;
+        audio.src = t.url;
+        titleEl.textContent  = t.title;
+        artistEl.textContent = t.artist;
+
+        seek.value = 0;
+        setFill(0);
+        curEl.textContent = '0:00';
+        durEl.textContent = t.dur ? fmt(t.dur) : '0:00';
+
+        rows.forEach((r, i) => r.classList.toggle('active', i === idx));
+        updateMediaSession(t);
+
+        if (autoplay) audio.play().catch(() => {});
+    }
+
+    // clicking a row: toggle if it's already loaded, otherwise load + play
+    function pick(idx) {
+        if (idx === current) { togglePlay(); return; }
+        history.push(current);
+        loadTrack(idx, true);
+    }
+
+    function togglePlay() {
+        if (audio.paused) audio.play().catch(() => {});
+        else audio.pause();
+    }
+
+    function randomOther() {
+        if (tracks.length < 2) return current;
+        let n;
+        do { n = Math.floor(Math.random() * tracks.length); } while (n === current);
+        return n;
+    }
+
+    function goNext(auto) {
+        let n;
+        if (shuffle) {
+            n = randomOther();
+        } else {
+            n = current + 1;
+            if (n >= tracks.length) {
+                // reached the end of the list
+                if (auto && repeat === 0) {
+                    audio.pause();
+                    audio.currentTime = 0;
+                    return;
+                }
+                n = 0;
+            }
         }
-    });
-}
+        history.push(current);
+        loadTrack(n, true);
+    }
 
-// ── BOOT ─────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
-    setupGrain(); setupWaveCanvas(); drawViz();
-    renderPlaylists(); setupSwipe(); setupKeyboard();
+    function goPrev() {
+        // restart the song if we're past 3 seconds, like a real player
+        if (audio.currentTime > 3) { audio.currentTime = 0; return; }
+        let n;
+        if (history.length) n = history.pop();
+        else n = (current - 1 + tracks.length) % tracks.length;
+        loadTrack(n, true);
+    }
 
-    playBtn.onclick = togglePlay;
-    prevBtn.onclick = () => loadTrack(getPrev());
-    nextBtn.onclick = () => loadTrack(getNext());
-    shuffleBtn.onclick = toggleShuffle;
-    repeatBtn.onclick  = toggleRepeat;
+    function toggleShuffle() {
+        shuffle = !shuffle;
+        shuffleBtn.classList.toggle('on', shuffle);
+        shuffleBtn.setAttribute('aria-label', shuffle ? 'Shuffle on' : 'Shuffle off');
+    }
 
-    audio.addEventListener('timeupdate', () => {
-        if (!audio.duration) return;
-        timeCur.textContent = fmt(audio.currentTime);
-        timeTot.textContent = fmt(audio.duration);
-        drawWave(audio.currentTime / audio.duration);
-    });
-    audio.addEventListener('ended', () => {
-        repeatMode === 2 ? (audio.currentTime = 0, audio.play()) : loadTrack(getNext());
-    });
-    window.addEventListener('resize', () => {
-        grainCanvas.width = window.innerWidth; grainCanvas.height = window.innerHeight;
-        setupWaveCanvas();
-    });
+    function toggleRepeat() {
+        repeat = (repeat + 1) % 3;
+        audio.loop = repeat === 2;
+        repeatBtn.dataset.mode = repeat;
+        repeatBtn.classList.toggle('on', repeat > 0);
+        repeatBtn.setAttribute('aria-label', ['Repeat off', 'Repeat all', 'Repeat one'][repeat]);
+    }
 
-    loadTrack(0, false);
-    ciTitle.textContent = globalPlaylist[0].title;
-    ciArtist.textContent = globalPlaylist[0].artist.toUpperCase();
-    ciNum.textContent = '01';
-});
+    // ── 8. LOCK-SCREEN / HEADPHONE CONTROLS ───────
+    function updateMediaSession(t) {
+        if (!('mediaSession' in navigator)) return;
+        try {
+            navigator.mediaSession.metadata = new MediaMetadata({
+                title: t.title, artist: t.artist, album: 'Sargam'
+            });
+        } catch (e) { /* ignore */ }
+    }
+    function setupMediaSession() {
+        if (!('mediaSession' in navigator)) return;
+        try {
+            navigator.mediaSession.setActionHandler('play',          () => audio.play());
+            navigator.mediaSession.setActionHandler('pause',         () => audio.pause());
+            navigator.mediaSession.setActionHandler('previoustrack', goPrev);
+            navigator.mediaSession.setActionHandler('nexttrack',     () => goNext(false));
+        } catch (e) { /* ignore */ }
+    }
+
+    // ── 9. EVENTS ─────────────────────────────────
+    function setupEvents() {
+        playBtn.addEventListener('click', togglePlay);
+        prevBtn.addEventListener('click', goPrev);
+        nextBtn.addEventListener('click', () => goNext(false));
+        shuffleBtn.addEventListener('click', toggleShuffle);
+        repeatBtn.addEventListener('click', toggleRepeat);
+
+        // keep UI in sync with the real audio element
+        audio.addEventListener('play', () => {
+            document.body.classList.add('is-playing');
+            document.title = `${tracks[current].title} · Sargam`;
+        });
+        audio.addEventListener('pause', () => {
+            document.body.classList.remove('is-playing');
+            document.title = 'Sargam';
+        });
+        audio.addEventListener('ended', () => goNext(true));
+
+        audio.addEventListener('loadedmetadata', () => {
+            tracks[current].dur = audio.duration;
+            durEl.textContent = fmt(audio.duration);
+        });
+        audio.addEventListener('timeupdate', () => {
+            if (seeking || !audio.duration) return;
+            const v = (audio.currentTime / audio.duration) * 1000;
+            seek.value = v;
+            setFill(v / 10);
+            curEl.textContent = fmt(audio.currentTime);
+        });
+        audio.addEventListener('error', () => {
+            document.body.classList.remove('is-playing');
+            artistEl.textContent = 'File not found · check music folder';
+        });
+
+        // simple slider
+        seek.addEventListener('input', () => {
+            seeking = true;
+            setFill(seek.value / 10);
+            if (audio.duration) curEl.textContent = fmt(audio.duration * seek.value / 1000);
+        });
+        seek.addEventListener('change', () => {
+            if (audio.duration) audio.currentTime = audio.duration * seek.value / 1000;
+            seeking = false;
+        });
+
+        // keyboard
+        document.addEventListener('keydown', e => {
+            const tag = e.target.tagName;
+            if (tag === 'TEXTAREA') return;
+            switch (e.code) {
+                case 'Space':
+                    if (tag === 'BUTTON') return;      // let the button handle it
+                    e.preventDefault();
+                    togglePlay();
+                    break;
+                case 'ArrowRight':
+                    if (tag === 'INPUT') return;       // slider keeps native arrows
+                    e.preventDefault();
+                    if (e.shiftKey) audio.currentTime = Math.min(audio.duration || 0, audio.currentTime + 10);
+                    else goNext(false);
+                    break;
+                case 'ArrowLeft':
+                    if (tag === 'INPUT') return;
+                    e.preventDefault();
+                    if (e.shiftKey) audio.currentTime = Math.max(0, audio.currentTime - 10);
+                    else goPrev();
+                    break;
+                case 'KeyS': toggleShuffle(); break;
+                case 'KeyR': toggleRepeat();  break;
+            }
+        });
+    }
+
+    // ── 10. BOOT ──────────────────────────────────
+    document.addEventListener('DOMContentLoaded', () => {
+        buildLibrary();
+        setupEvents();
+        setupMediaSession();
+        loadTrack(0, false);
+        loadDurations();
+    });
+})();
