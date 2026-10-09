@@ -1,79 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="theme-color" content="#7a4a26">
-    <title>Sargam</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Sargam</title>
+<link href="https://fonts.googleapis.com/css2?family=Bungee&family=VT323&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
+<audio id="audio" preload="metadata"></audio>
+<div class="lights" id="lights"></div>
+<h1 class="logo">SARGAM<small>side A &middot; 1997 &middot; hi-fi</small></h1>
+<main id="wall"></main>
 
-    <audio id="audio" preload="metadata"></audio>
-
-    <!-- window light falling across the desk -->
-    <div class="sunlight" aria-hidden="true"></div>
-
-    <!-- ───────── THE DESK (page) ───────── -->
-    <main class="desk">
-
-        <header class="masthead">
-            <p class="kicker">Private listening room &middot; Side A</p>
-            <h1 class="wordmark">Sargam</h1>
-            <p class="tagline">Press play. Everything else can wait.</p>
-            <div class="rule" aria-hidden="true"></div>
-        </header>
-
-        <div id="library"></div>
-
-        <footer class="colophon">Made by Evaan &middot; Stereo &middot; Hi-Fi</footer>
-
-    </main>
-
-    <!-- ───────── THE PLAYER DECK ───────── -->
-    <footer class="deck" id="deck">
-        <div class="faceplate">
-
-            <div class="info">
-                <div class="record" id="record" aria-hidden="true"></div>
-                <div class="display">
-                    <span class="led" aria-hidden="true"></span>
-                    <div class="display-title" id="title">Sargam</div>
-                    <div class="display-artist" id="artist">Pick a track</div>
-                </div>
-            </div>
-
-            <div class="scrub">
-                <span class="time" id="cur">0:00</span>
-                <input class="seek" id="seek" type="range" min="0" max="1000" value="0" step="1" aria-label="Seek">
-                <span class="time" id="dur">0:00</span>
-            </div>
-
-            <div class="keys">
-                <button class="key small" id="shuffleBtn" aria-label="Shuffle" title="Shuffle (S)">
-                    <svg viewBox="0 0 24 24"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg>
-                </button>
-                <button class="key" id="prevBtn" aria-label="Previous" title="Previous (←)">
-                    <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
-                </button>
-                <button class="key play" id="playBtn" aria-label="Play / Pause" title="Play / Pause (Space)">
-                    <svg class="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                    <svg class="icon-pause" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-                </button>
-                <button class="key" id="nextBtn" aria-label="Next" title="Next (→)">
-                    <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
-                </button>
-                <button class="key small" id="repeatBtn" data-mode="0" aria-label="Repeat off" title="Repeat (R)">
-                    <svg viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>
-                </button>
-            </div>
-
-        </div>
-    </footer>
-
-    <script src="script.js"></script>
+<footer class="deck" id="deck">
+  <div class="spk"></div>
+  <div class="mid">
+    <div class="tape">
+      <i class="reel"></i>
+      <div class="disp"><b id="title">SARGAM</b><span id="artist">tap a poster</span></div>
+      <i class="reel"></i>
+    </div>
+    <div class="row"><span id="cur">0:00</span><input id="seek" type="range" min="0" max="1000" value="0" aria-label="Seek"><span id="dur">0:00</span></div>
+    <div class="btns">
+      <button id="shuf" title="Shuffle">SHUF</button>
+      <button id="prev" aria-label="Previous">&#9664;&#9664;</button>
+      <button id="play" class="big" aria-label="Play">&#9654;</button>
+      <button id="next" aria-label="Next">&#9654;&#9654;</button>
+      <button id="lamp" title="Lights">LAMP</button>
+    </div>
+  </div>
+  <div class="spk"></div>
+</footer>
+<script src="script.js"></script>
 </body>
 </html>
