@@ -1,19 +1,9 @@
 // SARGAM v9 — add songs in LIB. Backgrounds: images/bollywood.jpg, punjabi.jpg, english.jpg
 (() => {
 const LIB = {
-  Bollywood: [
-    { title: "Fitoor",          artist: "Arijit Singh",      url: "music/bgmusic.mp3"  },
-    { title: "Saat Samundar",   artist: "Sadhana Sargam",    url: "music/bgmusic2.mp3" },
-    { title: "Tum Ho",          artist: "Mohit Chauhan",     url: "music/bgmusic3.mp3" }
-  ],
-  Punjabi: [
-    { title: "Channa",          artist: "Gippy Grewal",      url: "music/bgmusic4.mp3" },
-    { title: "Maar Sutiya",     artist: "Amrinder Gill",     url: "music/bgmusic5.mp3" }
-  ],
-  English: [
-    { title: "Espresso",        artist: "Sabrina Carpenter", url: "music/bgmusic6.mp3" },
-    { title: "Blinding Lights", artist: "The Weeknd",        url: "music/bgmusic7.mp3" }
-  ]
+  Bollywood: [],
+  Punjabi: [],
+  English: []
 };
 const T = [];
 Object.entries(LIB).forEach(([c, s]) => s.forEach((x, n) => T.push({ ...x, c, n })));
