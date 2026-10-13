@@ -66,7 +66,7 @@ async function scan() {
     localStorage.setItem('sargam-lib', JSON.stringify(found)); add(found);
   } catch (e) { try { add(JSON.parse(localStorage.getItem('sargam-lib') || '[]')); } catch (_) {} }
 }
-const setOpen = o => B.classList.toggle('open', o);
+const setOpen = o => { B.classList.toggle('open', o); if (o) kites(); };
 $('meta').onclick = e => { if (!e.target.closest('.bar')) setOpen(true); };
 $('meta').onkeydown = e => { if (e.key === 'Enter') setOpen(true); };
 $('bd').onclick = $('grab').onclick = () => setOpen(false);
@@ -135,18 +135,30 @@ addEventListener('resize', size); size();
 // living scene: leaves + birds
 const lc = $('leaves'), lg = lc.getContext('2d'); let leaves = [];
 const PAL = { Bollywood: ['#e2552b', '#ffb347', '#6bbf59'], Punjabi: ['#ffc93d', '#e8a317', '#7cb342'], English: ['#2ad4c4', '#9be15d', '#5aa469'] };
-const mk = first => ({ x: Math.random() * innerWidth, y: first ? Math.random() * innerHeight : -20, s: 5 + Math.random() * 7, v: .5 + Math.random() * .9,
-  ph: Math.random() * 6.28, sw: .01 + Math.random() * .02, a: Math.random() * 6.28, ra: (Math.random() - .5) * .04, ci: Math.floor(Math.random() * 3) });
-function lsize() { lc.width = innerWidth; lc.height = innerHeight; leaves = Array.from({ length: 16 }, () => mk(true)); }
+const mk = first => { const z = .45 + Math.random() * .8; return {
+  x: first ? Math.random() * innerWidth : Math.random() * (innerWidth + 200) - 100, y: first ? Math.random() * innerHeight * .8 : -30,
+  z, s: 6 * z + 4, v: .5 * z + .25, ph: Math.random() * 6.28, sw: .015 + Math.random() * .02,
+  a: Math.random() * 6.28, ra: (Math.random() - .5) * .05, fl: Math.random() * 6.28, ci: Math.floor(Math.random() * 3) }; };
+function lsize() { lc.width = innerWidth; lc.height = innerHeight; leaves = Array.from({ length: 11 }, () => mk(true)); }
 function lloop() {
   requestAnimationFrame(lloop); lg.clearRect(0, 0, lc.width, lc.height);
-  const pal = PAL[B.dataset.cat] || PAL.Bollywood;
+  const t = performance.now(), wind = .45 + Math.sin(t / 4000) * .5 + Math.sin(t / 1300) * .25, bt = window.__beat || 0;
+  const pal = PAL[B.dataset.cat] || PAL.Bollywood, night = B.dataset.tod === 'night';
   leaves.forEach(l => {
-    l.ph += l.sw; l.y += l.v * (1 + (window.__beat || 0) * 2.5); l.x += Math.sin(l.ph * 8) * .6 + .25; l.a += l.ra;
-    if (l.y > lc.height + 20 || l.x > lc.width + 20) Object.assign(l, mk(false));
-    lg.save(); lg.translate(l.x, l.y); lg.rotate(l.a); lg.globalAlpha = .85; lg.fillStyle = pal[l.ci];
-    lg.beginPath(); lg.ellipse(0, 0, l.s, l.s * .45, 0, 0, 6.283); lg.fill();
-    lg.strokeStyle = 'rgba(0,0,0,.25)'; lg.beginPath(); lg.moveTo(-l.s, 0); lg.lineTo(l.s, 0); lg.stroke(); lg.restore();
+    l.ph += l.sw; l.fl += .05 + l.z * .03;
+    l.x += wind * 1.4 * l.z + Math.sin(l.ph * 5) * .7 * l.z;
+    l.y += l.v * (1 + bt * 2) + Math.cos(l.ph * 3) * .15;
+    l.a += l.ra + wind * .01;
+    if (l.y > lc.height + 20 || l.x > lc.width + 60 || l.x < -140) Object.assign(l, mk(false));
+    const flip = Math.cos(l.fl);
+    const fade = Math.max(0, Math.min(1, (lc.height - l.y) / (lc.height * .18), (l.y + 30) / 60));
+    lg.save(); lg.translate(l.x, l.y); lg.rotate(l.a); lg.scale(1, .3 + .7 * Math.abs(flip));
+    lg.globalAlpha = Math.min(.9, .3 + l.z * .5) * fade * (night ? .5 : 1);
+    lg.fillStyle = pal[l.ci]; lg.beginPath(); lg.moveTo(-l.s, 0);
+    lg.quadraticCurveTo(0, -l.s * .65, l.s, 0); lg.quadraticCurveTo(0, l.s * .65, -l.s, 0); lg.fill();
+    lg.fillStyle = 'rgba(0,0,0,' + (.35 * (1 - Math.abs(flip))) + ')'; lg.fill();
+    lg.strokeStyle = 'rgba(0,0,0,.3)'; lg.lineWidth = .8; lg.beginPath(); lg.moveTo(-l.s * .9, 0); lg.lineTo(l.s * .9, 0); lg.stroke();
+    lg.restore();
   });
 }
 addEventListener('resize', lsize); lsize();
@@ -208,112 +220,44 @@ rb.replaceWith(pills); pills.append(rb, tb);
 tb.onclick = () => { mode = (mode + 1) % MODES.length; tb.querySelector('em').textContent = MODES[mode].toUpperCase(); applyTod(); };
 applyTod(); setInterval(applyTod, 60000);
 
-const fx = document.createElement('canvas'); fx.id = 'fx'; $('leaves').after(fx);
-const fg = fx.getContext('2d'); let stars = [], flies = [];
-function fsize() {
-  fx.width = innerWidth; fx.height = innerHeight;
-  stars = Array.from({ length: 70 }, () => ({ x: Math.random() * fx.width, y: Math.random() * fx.height * .45, r: Math.random() * 1.3 + .3, p: Math.random() * 6.28 }));
-  flies = Array.from({ length: 14 }, () => ({ x: Math.random() * fx.width, y: fx.height * (.35 + Math.random() * .55), a: Math.random() * 6.28, s: .3 + Math.random() * .6, p: Math.random() * 6.28 }));
-}
-addEventListener('resize', fsize); fsize();
-(function floop(t) {
-  requestAnimationFrame(floop); fg.clearRect(0, 0, fx.width, fx.height);
-  const p = B.dataset.tod; if (p !== 'night' && p !== 'evening') return;
-  if (p === 'night') stars.forEach(st => {
-    fg.globalAlpha = Math.min(1, .3 + .5 * Math.abs(Math.sin(t / 900 + st.p)) + beat * .3);
-    fg.fillStyle = '#fff'; fg.beginPath(); fg.arc(st.x, st.y, st.r, 0, 6.283); fg.fill();
-  });
-  flies.forEach(f => {
-    f.a += (Math.random() - .5) * .25; f.x += Math.cos(f.a) * f.s; f.y += Math.sin(f.a) * f.s * .6;
-    if (f.x < -10) f.x = fx.width + 10; if (f.x > fx.width + 10) f.x = -10;
-    if (f.y < fx.height * .3) f.y = fx.height * .3; if (f.y > fx.height) f.y = fx.height * .9;
-    const r = 4 + beat * 8, al = (.35 + .65 * Math.abs(Math.sin(t / 600 + f.p))) * (p === 'evening' ? .6 : 1);
-    const gr = fg.createRadialGradient(f.x, f.y, 0, f.x, f.y, r * 3);
-    gr.addColorStop(0, 'rgba(255,232,140,' + al + ')'); gr.addColorStop(1, 'rgba(255,232,140,0)');
-    fg.globalAlpha = 1; fg.fillStyle = gr; fg.fillRect(f.x - r * 3, f.y - r * 3, r * 6, r * 6);
-  });
-  fg.globalAlpha = 1;
-})(0);
 
-// ── radio tuner dial: drag to browse songs, tap a station to play ──
-const SP = 84, CC = { Bollywood: '#ff6a3d', Punjabi: '#ffc93d', English: '#2ad4c4' };
-const tun = document.createElement('section'); tun.className = 'tuner';
-tun.innerHTML = '<div class="hint" id="hint">&#9664; drag to tune &#9654;</div><div class="dial" id="dial"><div class="strip" id="strip"></div><div class="needle"></div><div class="glass"></div></div><div class="rd"><b id="rdF">88.0 FM</b><span id="rdN">&nbsp;</span><button class="listbtn" id="listBtn">LIST</button></div>';
-$('player').after(tun);
-const dial = $('dial'), strip = $('strip'); let pos = 0, drag = null, stEls = [], tuned = -1;
-const setPos = (p, snap) => {
-  pos = Math.min(Math.max(0, (T.length - 1) * SP), Math.max(0, p));
-  strip.classList.toggle('snap', !!snap);
-  strip.style.transform = 'translateX(' + (dial.clientWidth / 2 - pos) + 'px)';
-};
-function mark(i) {
-  if (i === tuned || !T[i]) return; tuned = i;
-  stEls.forEach((e, j) => e.classList.toggle('on', j === i));
-  $('rdF').textContent = (88 + (i * 0.7) % 20).toFixed(1) + ' FM';
-  $('rdN').textContent = T[i].title + ' \u00b7 ' + T[i].c;
-}
-function buildStrip() {
-  strip.innerHTML = ''; stEls = []; tuned = -1; strip.style.width = T.length * SP + 'px';
+// ── song list: a sky of kites ──
+const KC = { Bollywood: ['#ff7a3d', '#e2552b'], Punjabi: ['#ffd23f', '#ff8a1f'], English: ['#35e0cf', '#1a8fb5'] }, KD = ['#ff5ea8', '#b44cff'];
+const kz = document.createElement('div'); kz.className = 'kites';
+kz.innerHTML = '<button class="kx" id="kx" aria-label="Close">&times;</button><div class="kchips" id="kchips"></div><div class="kgrid" id="kgrid"></div>';
+document.body.append(kz);
+const launcher = document.createElement('button'); launcher.className = 'kl'; launcher.setAttribute('aria-label', 'Open song list');
+launcher.innerHTML = '<span class="kb"><i class="kt"></i><i class="tail"></i></span><em>SONGS</em>';
+try { if (localStorage.getItem('sargam-kite')) launcher.classList.add('seen'); } catch (e) {}
+$('player').after(launcher);
+let kcat = 'All';
+function kites() {
+  const ch = $('kchips'), gr = $('kgrid'); ch.innerHTML = ''; gr.innerHTML = '';
+  ['All', ...new Set(T.map(t => t.c))].forEach(c => {
+    const b = document.createElement('button'); b.textContent = c; if (c === kcat) b.className = 'on';
+    b.onclick = () => { kcat = c; kites(); }; ch.append(b);
+  });
+  if (!T.length) { gr.textContent = 'No songs yet. Add mp3 files to your music folders.'; return; }
   T.forEach((t, i) => {
-    const e = document.createElement('div'); e.className = 'st'; e.style.left = i * SP + 'px';
-    e.style.setProperty('--c', CC[t.c] || '#ffcf8a');
-    const l = document.createElement('i'); l.textContent = t.title; e.append(l); strip.append(e); stEls.push(e);
+    if (kcat !== 'All' && t.c !== kcat) return;
+    const [k1, k2] = KC[t.c] || KD, k = document.createElement('button');
+    k.className = 'kite' + (i === cur ? ' on' : '');
+    k.style.cssText = '--k1:' + k1 + ';--k2:' + k2 + ';--sw:' + (2.4 + Math.random() * 2).toFixed(1) + 's;--sd:-' + (Math.random() * 3).toFixed(1) + 's;--my:' + Math.round(Math.random() * 34) + 'px';
+    k.innerHTML = '<span class="kb"><i class="kt"></i><i class="tail"></i></span><span class="tg"><b></b><small></small></span>';
+    k.querySelector('b').textContent = t.title; k.querySelector('small').textContent = t.artist;
+    k.onclick = () => { k.classList.add('caught'); setTimeout(() => { setOpen(false); load(i, true); }, 480); };
+    gr.append(k);
   });
-  setPos(cur * SP); mark(cur);
+  const lr = launcher.getBoundingClientRect(), lx = lr.left + lr.width / 2, ly = lr.top + 20;
+  [...gr.children].forEach((k, n) => {   // every kite is launched from the little kite in the corner
+    const r = k.getBoundingClientRect();
+    k.style.setProperty('--dx', lx - (r.left + r.width / 2) + 'px'); k.style.setProperty('--dy', ly - (r.top + 20) + 'px');
+    k.style.setProperty('--dl', Math.min(n * 40, 800) + 'ms');
+  });
 }
-// radio static between stations
-let sctx, ng;
-function noiseInit() {
-  if (sctx) return;
-  try {
-    sctx = new (window.AudioContext || window.webkitAudioContext)();
-    const b = sctx.createBuffer(1, sctx.sampleRate, sctx.sampleRate), d = b.getChannelData(0);
-    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
-    const nz = sctx.createBufferSource(); nz.buffer = b; nz.loop = true;
-    const f = sctx.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = 2400;
-    ng = sctx.createGain(); ng.gain.value = 0;
-    nz.connect(f); f.connect(ng); ng.connect(sctx.destination); nz.start();
-  } catch (e) { sctx = null; }
-}
-const hiss = g => { if (ng) ng.gain.setTargetAtTime(g, sctx.currentTime, .04); };
-const tick = () => { if (navigator.vibrate) navigator.vibrate(6); };
-const seen = () => { try { return localStorage.getItem('sargam-tuned'); } catch (e) { return 1; } };
-
-dial.addEventListener('pointerdown', e => {
-  noiseInit(); if (sctx && sctx.state === 'suspended') sctx.resume();
-  drag = { x: e.clientX, p: pos, moved: 0 }; dial.setPointerCapture(e.pointerId);
-  strip.classList.remove('snap'); a.volume = .3; $('hint').classList.add('off');
-  try { localStorage.setItem('sargam-tuned', 1); } catch (err) {}
-});
-dial.addEventListener('pointermove', e => {
-  if (!drag) return;
-  const dx = e.clientX - drag.x; drag.moved = Math.max(drag.moved, Math.abs(dx));
-  setPos(drag.p - dx);
-  const f = pos / SP, i = Math.round(f);
-  hiss(.015 + Math.abs(f - i) * .22);
-  if (i !== tuned) { mark(i); tick(); }
-});
-const release = e => {
-  if (!drag) return;
-  let i = Math.round(pos / SP);
-  if (drag.moved < 6) {   // a tap: jump to the station under the finger
-    i = Math.round((pos + e.clientX - dial.getBoundingClientRect().left - dial.clientWidth / 2) / SP);
-    i = Math.min(T.length - 1, Math.max(0, i));
-  }
-  drag = null; a.volume = 1; hiss(0); setPos(i * SP, true); mark(i);
-  if (i !== cur) load(i, true); else if (a.paused) a.play().catch(() => {});
-};
-dial.addEventListener('pointerup', release); dial.addEventListener('pointercancel', release);
-$('listBtn').onclick = () => setOpen(true);
-addEventListener('resize', () => setPos(pos));
-
-// keep the dial in step with the player and the library
-const _rl = renderList; renderList = () => { _rl(); buildStrip(); };
-const _ld = load; load = (i, p) => { _ld(i, p); if (!drag) { setPos(i * SP, true); mark(i); } };
-
-// first-time hint: the dial nudges itself once
-if (seen()) $('hint').classList.add('off');
-else setTimeout(() => { if (!drag && T.length > 1) { setPos(pos + SP * .9, true); setTimeout(() => { if (!drag) setPos(cur * SP, true); }, 650); } }, 2200);
+launcher.onclick = () => { try { localStorage.setItem('sargam-kite', 1); } catch (e) {} launcher.classList.add('seen'); setOpen(true); };
+$('kx').onclick = () => setOpen(false);
+$('kgrid').onclick = e => { if (e.target.id === 'kgrid') setOpen(false); };
 
 // install as app (works offline)
 if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
